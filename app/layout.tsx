@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ডিজিটাল শেবা বিডি - Digital Sheba BD',
-  description: 'বাংলাদেশের সেরা ডিজিটাল সেবা প্ল্যাটফর্ম। NID, স্মার্টকার্ড, TIN সহ সকল সরকারি সেবা এক জায়গায়।',
+  title: 'সহজ ডিজিটাল সেবা - Shohoj Digital Sheba',
+  description: 'বাংলাদেশের সহজ ডিজিটাল সেবা প্ল্যাটফর্ম। NID, স্মার্টকার্ড, TIN সহ ৪২টিরও বেশি সরকারি সেবা এক জায়গায়।',
 }
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
