@@ -31,18 +31,18 @@ export default function HomePage() {
             <div className="text-white animate-fade-in">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 text-sm">
                 <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
-                🇧🇩 বাংলাদেশের #১ ডিজিটাল সেবা প্ল্যাটফর্ম
+                🇧🇩 সহজ ডিজিটাল সেবা প্ল্যাটফর্ম
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
                 সকল সরকারি সেবা
                 <span className="block text-green-300">এক জায়গায়</span>
               </h1>
               <p className="text-green-100 text-lg leading-relaxed mb-8">
-                NID, স্মার্টকার্ড, TIN, জন্ম নিবন্ধন সহ ৩১টিরও বেশি সরকারি সেবা এখন আপনার হাতের মুঠোয়।
+                NID, স্মার্টকার্ড, TIN, জন্ম নিবন্ধন সহ ৪২টিরও বেশি সরকারি সেবা এখন আপনার হাতের মুঠোয়।
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/auth/register" className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#1a7a3c] font-bold rounded-xl hover:bg-green-50 transition-all shadow-lg text-lg">
-                  বিনামূল্যে রেজিস্ট্রেশন <ArrowRight size={20} />
+                <Link href="/dashboard" className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#1a7a3c] font-bold rounded-xl hover:bg-green-50 transition-all shadow-lg text-lg">
+                  সেবা দেখুন <ArrowRight size={20} />
                 </Link>
                 <Link href="/auth/login" className="flex items-center justify-center gap-2 px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-bold rounded-xl hover:bg-white/30 transition-all border border-white/30 text-lg">
                   লগইন করুন
@@ -97,7 +97,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {services.filter(s => s.popular).map(s => (
-            <Link key={s.id} href="/auth/register" className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100 service-card group">
+            <Link key={s.id} href="/dashboard" className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100 service-card group">
               <div className={`w-12 h-12 ${s.color} rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform`}>{s.icon}</div>
               <p className="text-xs font-semibold text-gray-700 leading-tight">{s.title}</p>
             </Link>
@@ -125,7 +125,7 @@ export default function HomePage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {filteredServices.map(s => (
-            <Link key={s.id} href="/auth/register" className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100 service-card group">
+            <Link key={s.id} href="/dashboard" className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100 service-card group">
               <div className={`w-11 h-11 ${s.color} rounded-xl flex items-center justify-center text-xl mx-auto mb-2 group-hover:scale-110 transition-transform`}>{s.icon}</div>
               <p className="text-xs font-medium text-gray-700 leading-tight">{s.title}</p>
             </Link>
@@ -139,8 +139,8 @@ export default function HomePage() {
         <div className="relative text-center text-white max-w-2xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">আজই শুরু করুন</h2>
           <p className="text-green-100 text-lg mb-8">বিনামূল্যে অ্যাকাউন্ট খুলুন এবং সকল সরকারি সেবা উপভোগ করুন</p>
-          <Link href="/auth/register" className="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#1a7a3c] font-bold rounded-xl hover:bg-green-50 transition-all shadow-lg text-lg">
-            নতুন একাউন্ট করুন - একদম ফ্রিতে <ArrowRight size={20} />
+          <Link href="/dashboard" className="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#1a7a3c] font-bold rounded-xl hover:bg-green-50 transition-all shadow-lg text-lg">
+            সেবাসমূহ দেখুন <ArrowRight size={20} />
           </Link>
         </div>
       </section>

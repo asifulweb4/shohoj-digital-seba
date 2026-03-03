@@ -2,7 +2,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Eye, EyeOff, LogIn, Mail, Lock, CheckCircle, Phone } from 'lucide-react'
+import { Eye, EyeOff, LogIn, Lock, CheckCircle, Phone } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 function LoginForm() {
@@ -12,8 +12,6 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [justRegistered, setJustRegistered] = useState(false)
-
-  // identifier ব্যবহার করছি ইমেইল বা ফোন দুটোর জন্যই
   const [form, setForm] = useState({ identifier: '', password: '' })
 
   useEffect(() => {
@@ -35,28 +33,26 @@ function LoginForm() {
 
     setLoading(true)
 
-    let emailToLogin = form.identifier;
+    let emailToLogin = form.identifier
 
-    // লজিক: ইনপুটে @ না থাকলে ফোন হিসেবে ধরে প্রোফাইল খুঁজুন
     if (!form.identifier.includes('@')) {
       const { data: profile_email, error: profileError } = await supabase
-        .rpc('get_email_by_phone', { p_phone: form.identifier });
+        .rpc('get_email_by_phone', { p_phone: form.identifier })
 
       if (profileError || !profile_email || profile_email.length === 0) {
-        setError('এই ফোন নাম্বারটি খুঁজে পাওয়া যায়নি');
-        setLoading(false);
-        return;
+        setError('এই ফোন নাম্বারটি খুঁজে পাওয়া যায়নি')
+        setLoading(false)
+        return
       }
 
-      emailToLogin = profile_email[0].email;
+      emailToLogin = profile_email[0].email
       if (!emailToLogin) {
-        setError('এই প্রোফাইলে কোনো ইমেইল পাওয়া যায়নি। দয়া করে ইমেইল দিয়ে লগইন করুন।');
-        setLoading(false);
-        return;
+        setError('এই প্রোফাইলে কোনো ইমেইল পাওয়া যায়নি। দয়া করে ইমেইল দিয়ে লগইন করুন।')
+        setLoading(false)
+        return
       }
     }
 
-    // লগইন করুন
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: emailToLogin,
       password: form.password,
@@ -72,28 +68,59 @@ function LoginForm() {
       return
     }
 
+    // লগইন সফল → ড্যাশবোর্ডে যান
     router.push('/dashboard')
   }
 
-  // ... (JSX কোড আগের মতোই থাকবে, শুধু input name="identifier" এবং লেবেল পরিবর্তন করুন)
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f0fdf4] via-white to-[#dcfce7] flex">
-      {/* ... Left Panel ... */}
+      {/* Left Panel */}
       <div className="hidden lg:flex lg:w-1/2 hero-gradient flex-col justify-center items-center p-12 relative overflow-hidden">
-        {/* ... (একই কোড) ... */}
+        <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-white opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-green-300 opacity-10 blur-3xl"></div>
+        <div className="relative text-center text-white">
+          <div className="w-20 h-20 rounded-3xl bg-white/20 flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+            <span className="text-4xl font-bold">স</span>
+          </div>
+          <h1 className="text-4xl font-bold mb-3">সহজ ডিজিটাল সেবা</h1>
+          <p className="text-green-100 text-lg mb-10">বাংলাদেশের সহজ ডিজিটাল সেবা প্ল্যাটফর্ম</p>
+          <div className="space-y-4 text-left">
+            {[
+              'NID, জন্ম নিবন্ধন, TIN সেবা',
+              '৪২টিরও বেশি সরকারি সেবা',
+              '১০০% নিরাপদ ও দ্রুত সেবা',
+              '২৪/৭ সহায়তা পাওয়া যায়',
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                <CheckCircle size={20} className="text-green-300 flex-shrink-0" />
+                <span className="text-sm">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
+      {/* Right Panel - Form */}
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12">
         <div className="w-full max-w-md">
-          {/* ... Mobile Logo ... */}
+          {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            {/* ... (একই কোড) ... */}
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1a7a3c] to-[#22c55e] flex items-center justify-center mx-auto mb-3 shadow-lg">
+              <span className="text-white font-bold text-2xl">স</span>
+            </div>
+            <h1 className="text-xl font-bold text-[#1a7a3c]">সহজ ডিজিটাল সেবা</h1>
           </div>
 
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-800">লগইন করুন</h2>
             <p className="text-gray-500 mt-2">আপনার অ্যাকাউন্টে প্রবেশ করুন</p>
           </div>
+
+          {justRegistered && (
+            <div className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl mb-5 flex items-center gap-2">
+              <CheckCircle size={16} /> রেজিস্ট্রেশন সফল হয়েছে! এখন লগইন করুন।
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -102,17 +129,16 @@ function LoginForm() {
                 <Phone size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  name="identifier" // identifier নামে state update হবে
+                  name="identifier"
                   value={form.identifier}
                   onChange={handleChange}
-                  placeholder="example@gmail.com বা 01XXXXXXX"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm"
+                  placeholder="example@gmail.com বা 01XXXXXXXX"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]"
                   required
                 />
               </div>
             </div>
 
-            {/* ... Password Input, Error Message, Submit Button (একই কোড) ... */}
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-sm font-medium text-gray-700">পাসওয়ার্ড</label>
@@ -120,7 +146,15 @@ function LoginForm() {
               </div>
               <div className="relative">
                 <Lock size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type={showPassword ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="আপনার পাসওয়ার্ড" className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm" required />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="আপনার পাসওয়ার্ড"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]"
+                  required
+                />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -128,15 +162,34 @@ function LoginForm() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl animate-fade-in">
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
                 ⚠️ {error}
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-4 btn-primary text-white font-bold rounded-xl text-lg">
-              {loading ? <><div className="w-5 h-5 spinner"></div> লগইন হচ্ছে...</> : <><LogIn size={20} /> লগইন করুন</>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-4 btn-primary text-white font-bold rounded-xl text-lg disabled:opacity-70"
+            >
+              {loading
+                ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> লগইন হচ্ছে...</>
+                : <><LogIn size={20} /> লগইন করুন</>
+              }
             </button>
-            {/* ... (একই কোড) ... */}
+
+            <p className="text-center text-sm text-gray-500">
+              অ্যাকাউন্ট নেই?{' '}
+              <Link href="/auth/register" className="text-[#1a7a3c] font-bold hover:underline">
+                বিনামূল্যে রেজিস্ট্রেশন করুন
+              </Link>
+            </p>
+
+            <div className="text-center">
+              <Link href="/dashboard" className="text-sm text-gray-400 hover:text-[#1a7a3c] transition-colors underline underline-offset-2">
+                লগইন ছাড়াই ড্যাশবোর্ড দেখুন →
+              </Link>
+            </div>
           </form>
         </div>
       </div>
@@ -148,7 +201,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#f0fdf4] flex items-center justify-center">
-        <div className="w-12 h-12 spinner border-4 border-[#1a7a3c] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-[#1a7a3c] border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
       <LoginForm />

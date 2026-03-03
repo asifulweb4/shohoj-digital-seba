@@ -90,9 +90,7 @@ export default function RegisterPage() {
               </div>
             ))}
           </div>
-          <div className="mt-10 p-4 bg-white/10 backdrop-blur-sm rounded-2xl text-sm text-green-100">
-            🔒 Supabase দ্বারা সুরক্ষিত — ১০০% নিরাপদ
-          </div>
+
         </div>
       </div>
 
@@ -161,14 +159,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* NID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">NID নম্বর <span className="text-gray-400 text-xs">(ঐচ্ছিক)</span></label>
-                  <div className="relative">
-                    <CreditCard size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" name="nid" value={form.nid} onChange={handleChange} placeholder="জাতীয় পরিচয়পত্র নম্বর" className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm" />
-                  </div>
-                </div>
+
 
                 {/* Password */}
                 <div>

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Home, Menu, X, LogOut, User, Search, Bell, Wallet, Settings, Clock, Send } from 'lucide-react'
+import { Home, Menu, X, LogOut, User, Search, Bell, Wallet, Settings, Clock, Send, LogIn, UserPlus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import { services, categories } from '@/lib/services'
@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeService, setActiveService] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isGuest, setIsGuest] = useState(false)
 
   // পেমেন্ট এবং অর্ডারের নতুন স্টেট
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
@@ -27,7 +28,11 @@ export default function DashboardPage() {
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { router.push('/auth/login'); return }
+      if (!session) {
+        // লগইন না থাকলে → front page এ পাঠাও
+        router.push('/')
+        return
+      }
 
       const { data: profileData } = await supabase
         .from('profiles')
@@ -36,10 +41,16 @@ export default function DashboardPage() {
         .single()
 
       setProfile(profileData)
+      setIsGuest(false)
       setLoading(false)
     }
     getUser()
   }, [router])
+
+
+
+
+
 
   // ১. ব্যালেন্স রিচার্জ রিকোয়েস্ট ফাংশন
   const handleAddBalance = async () => {
@@ -136,16 +147,28 @@ export default function DashboardPage() {
         <div className="flex flex-col h-full">
           <div className="p-5 border-b border-[#1a7a3c]">
             <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-3 text-white font-bold">ডিজিটাল শেবা</Link>
+              <Link href="/" className="flex items-center gap-3 text-white font-bold">সহজ ডিজিটাল সেবা</Link>
               <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white"><X /></button>
             </div>
           </div>
           <div className="p-5">
-            <div className="bg-[#1a7a3c] rounded-xl p-4 text-white">
-              <p className="text-xs opacity-70">বর্তমান ব্যালেন্স</p>
-              <p className="text-2xl font-bold">{profile?.balance || 0} ৳</p>
-              <button onClick={() => setPaymentModalOpen(true)} className="mt-2 w-full bg-white text-green-800 py-1.5 rounded-lg text-xs font-bold">রিচার্জ করুন</button>
-            </div>
+            {isGuest ? (
+              <div className="bg-[#1a7a3c] rounded-xl p-4 text-white space-y-2">
+                <p className="text-xs opacity-70 text-center">সেবা নিতে প্রথমে লগিন করুন</p>
+                <Link href="/auth/login" className="w-full bg-white text-green-800 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                  <LogIn size={13} /> লগিন
+                </Link>
+                <Link href="/auth/register" className="w-full bg-green-600 text-white py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                  <UserPlus size={13} /> রেজিস্ট্রেশন
+                </Link>
+              </div>
+            ) : (
+              <div className="bg-[#1a7a3c] rounded-xl p-4 text-white">
+                <p className="text-xs opacity-70">বর্তমান ব্যালেন্স</p>
+                <p className="text-2xl font-bold">{profile?.balance || 0} ৳</p>
+                <button onClick={() => setPaymentModalOpen(true)} className="mt-2 w-full bg-white text-green-800 py-1.5 rounded-lg text-xs font-bold">রিচার্জ করুন</button>
+              </div>
+            )}
           </div>
           <nav className="flex-1 p-4 space-y-1">
             {navItems.map(item => (
@@ -155,9 +178,15 @@ export default function DashboardPage() {
             ))}
           </nav>
           <div className="p-4 border-t border-[#1a7a3c]">
-            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 transition text-sm">
-              <LogOut size={18} /> লগআউট
-            </button>
+            {isGuest ? (
+              <Link href="/auth/login" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-green-300 hover:bg-[#1a7a3c] transition text-sm">
+                <LogIn size={18} /> লগিন / রেজিস্ট্রেশন
+              </Link>
+            ) : (
+              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 transition text-sm">
+                <LogOut size={18} /> লগআউট
+              </button>
+            )}
           </div>
         </div>
       </aside>
@@ -181,14 +210,32 @@ export default function DashboardPage() {
 
         <main className="p-4 sm:p-6 overflow-y-auto">
           {/* Welcome banner */}
-          <div className="bg-gradient-to-r from-[#1a7a3c] to-[#22c55e] rounded-3xl p-6 mb-6 text-white flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold">আস্সালামু আলাইকুম, {profile?.full_name?.split(' ')[0]}! 👋</h2>
-              <p className="text-green-100 text-sm mt-1">আজকে আপনি কোন সেবাটি নিতে চান?</p>
-              <button onClick={() => setPaymentModalOpen(true)} className="mt-4 bg-white text-[#1a7a3c] px-6 py-2 rounded-xl font-bold text-sm shadow-lg">ব্যালেন্স যোগ করুন</button>
+          {isGuest ? (
+            <div className="bg-gradient-to-r from-[#1a7a3c] to-[#22c55e] rounded-3xl p-6 mb-6 text-white flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold">সহজ ডিজিটাল সেবা-তে স্বাগতম! 👋</h2>
+                <p className="text-green-100 text-sm mt-1">সেবা অর্ডার করতে লগিন বা রেজিস্ট্রেশন করুন — সম্পূর্ণ বিনামূল্যে!</p>
+                <div className="flex gap-3 mt-4">
+                  <Link href="/auth/register" className="bg-white text-[#1a7a3c] px-5 py-2 rounded-xl font-bold text-sm shadow-lg flex items-center gap-1">
+                    <UserPlus size={15} /> বিনামূল্যে যোগ দিন
+                  </Link>
+                  <Link href="/auth/login" className="bg-white/20 text-white px-5 py-2 rounded-xl font-bold text-sm border border-white/30 flex items-center gap-1">
+                    <LogIn size={15} /> লগিন
+                  </Link>
+                </div>
+              </div>
+              <Wallet size={80} className="opacity-20 hidden md:block" />
             </div>
-            <Wallet size={80} className="opacity-20 hidden md:block" />
-          </div>
+          ) : (
+            <div className="bg-gradient-to-r from-[#1a7a3c] to-[#22c55e] rounded-3xl p-6 mb-6 text-white flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold">আস্সালামু আলাইকুম, {profile?.full_name?.split(' ')[0]}! 👋</h2>
+                <p className="text-green-100 text-sm mt-1">আজকে আপনি কোন সেবাটি নিতে চান?</p>
+                <button onClick={() => setPaymentModalOpen(true)} className="mt-4 bg-white text-[#1a7a3c] px-6 py-2 rounded-xl font-bold text-sm shadow-lg">ব্যালেন্স যোগ করুন</button>
+              </div>
+              <Wallet size={80} className="opacity-20 hidden md:block" />
+            </div>
+          )}
 
           {/* Categories */}
           <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
@@ -241,13 +288,38 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* সার্ভিস অর্ডার মোডাল */}
+          {/* সার্ভিস অর্ডার মোডাল (Guest হলে লগিন prompt, লগিন হলে order form) */}
           {activeService && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setActiveService(null)}>
               <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
                 {(() => {
                   const s = services.find(sv => sv.id === activeService)
                   if (!s) return null
+
+                  // Guest mode: লগিন প্রম্পট
+                  if (isGuest) return (
+                    <>
+                      <div className="flex items-center gap-4 mb-5">
+                        <div className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-3xl shadow-lg`}>{s.icon}</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">{s.title}</h3>
+                          <p className="text-green-600 font-bold text-sm">চার্জ: {s.price} ৳</p>
+                        </div>
+                      </div>
+                      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 text-center">
+                        <p className="text-amber-800 font-bold mb-1">🔒 লগিন প্রয়োজন</p>
+                        <p className="text-amber-600 text-sm">এই সেবা নিতে প্রথমে লগিন করুন অথবা বিনামূল্যে আকাউন্ট বানান</p>
+                      </div>
+                      <div className="flex gap-3">
+                        <button onClick={() => setActiveService(null)} className="flex-1 py-4 bg-gray-100 rounded-2xl font-bold text-gray-500">বাতিল</button>
+                        <Link href="/auth/login" className="flex-1 py-4 bg-[#1a7a3c] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg">
+                          <LogIn size={18} /> লগিন
+                        </Link>
+                      </div>
+                    </>
+                  )
+
+                  // Logged-in: normal order form
                   return (
                     <>
                       <div className="flex items-center gap-4 mb-5">

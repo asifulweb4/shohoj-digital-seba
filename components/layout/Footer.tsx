@@ -9,11 +9,11 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#22c55e] to-[#4ade80] flex items-center justify-center">
-                <span className="text-white font-bold text-lg">ড</span>
+                <span className="text-white font-bold text-lg">স</span>
               </div>
               <div>
-                <div className="text-white font-bold text-lg leading-tight">ডিজিটাল শেবা বিডি</div>
-                <div className="text-green-400 text-xs">Digital Sheba BD</div>
+                <div className="text-white font-bold text-lg leading-tight">সহজ ডিজিটাল সেবা</div>
+                <div className="text-green-400 text-xs">Shohoj Digital Sheba</div>
               </div>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">বাংলাদেশের সকল সরকারি সেবা এখন এক জায়গায়। দ্রুত, সহজ এবং নির্ভরযোগ্য।</p>
@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-[#1a7a3c] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <p className="text-gray-400 text-sm">© ২০২৬ ডিজিটাল শেবা বিডি। সর্বস্বত্ব সংরক্ষিত।</p>
+          <p className="text-gray-400 text-sm">© ২০২৬ সহজ ডিজিটাল সেবা। সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex gap-4 text-xs text-gray-400">
             <Link href="/privacy" className="hover:text-green-300">গোপনীয়তা নীতি</Link>
             <Link href="/terms" className="hover:text-green-300">শর্তাবলী</Link>
