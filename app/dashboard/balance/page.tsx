@@ -9,7 +9,6 @@ export default function BalancePage() {
     const [depositAmount, setDepositAmount] = useState('')
     const [trxId, setTrxId] = useState('')
     const [senderNumber, setSenderNumber] = useState('')
-    const [gmail, setGmail] = useState('')
     const [method, setMethod] = useState('bKash')
     const [accountType, setAccountType] = useState('Personal') // Personal or Business
     const [submitting, setSubmitting] = useState(false)
@@ -45,7 +44,7 @@ export default function BalancePage() {
                 trx_id: trxId,
                 method: method,
                 status: 'pending',
-                description: `Recharge: ${accountType}, Sender: ${senderNumber}, Email: ${gmail}`
+                description: `Recharge: ${accountType}, Sender: ${senderNumber}`
             }
         ])
 
@@ -57,7 +56,6 @@ export default function BalancePage() {
             setTrxId('')
             setDepositAmount('')
             setSenderNumber('')
-            setGmail('')
             router.push('/dashboard')
         }
     }
@@ -173,20 +171,7 @@ export default function BalancePage() {
                             </div>
                         </div>
 
-                        {/* Gmail */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Gmail</label>
-                            <div className="relative">
-                                <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="email"
-                                    placeholder="example@gmail.com"
-                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#7c3aed]/30 focus:border-[#7c3aed] outline-none transition-all text-gray-800 placeholder-gray-400"
-                                    value={gmail}
-                                    onChange={e => setGmail(e.target.value)}
-                                />
-                            </div>
-                        </div>
+
 
                         {/* Transaction ID */}
                         <div>
@@ -206,16 +191,12 @@ export default function BalancePage() {
                         {/* Amount */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Amount</label>
-                            <div className="relative">
-                                <Landmark size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="number"
-                                    placeholder={`Min ${accountType === 'Personal' ? 500 : 1000}`}
-                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#7c3aed]/30 focus:border-[#7c3aed] outline-none transition-all text-gray-800 placeholder-gray-400"
-                                    value={depositAmount}
-                                    onChange={e => setDepositAmount(e.target.value)}
-                                />
-                            </div>
+                            <input
+                                type="number"
+                                className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#7c3aed]/30 focus:border-[#7c3aed] outline-none transition-all text-gray-800 placeholder-gray-400"
+                                value={depositAmount}
+                                onChange={e => setDepositAmount(e.target.value)}
+                            />
                         </div>
 
                         {/* Action Buttons */}

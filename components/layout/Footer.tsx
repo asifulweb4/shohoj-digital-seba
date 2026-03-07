@@ -45,20 +45,21 @@ export default function Footer() {
             <h3 className="font-bold text-lg mb-4 text-violet-300">যোগাযোগ</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3 text-gray-300"><MapPin size={16} className="text-violet-400 mt-0.5 flex-shrink-0" /><span>ঢাকা, বাংলাদেশ</span></li>
-              <li className="flex items-center gap-3 text-gray-300"><Phone size={16} className="text-violet-400 flex-shrink-0" /><a href="tel:01700000000" className="hover:text-violet-300">০১৭০০-০০০০০০</a></li>
+              <li className="flex items-center gap-3 text-gray-300">
+                <Phone size={16} className="text-violet-400 flex-shrink-0" />
+                <div className="flex flex-col">
+                  <a href="tel:01611426959" className="hover:text-violet-300">01611426959</a>
+                  <a href="https://wa.me/8801611426959" target="_blank" rel="noopener noreferrer" className="text-xs text-green-400 hover:text-green-300">WhatsApp-এ মেসেজ দিন</a>
+                </div>
+              </li>
               <li className="flex items-center gap-3 text-gray-300"><Mail size={16} className="text-violet-400 flex-shrink-0" /><span className="break-all">support@digitalshebabd.com</span></li>
             </ul>
-            <div className="mt-4 p-3 bg-[#7c3aed] rounded-lg">
-              <p className="text-xs text-gray-200">📞 সাপোর্ট সময়</p>
-              <p className="text-sm font-medium">সকাল ৮টা - রাত ১০টা</p>
-              <p className="text-xs text-violet-300">সপ্তাহে ৭ দিন</p>
-            </div>
           </div>
         </div>
       </div>
       <div className="border-t border-[#7c3aed] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <p className="text-gray-400 text-sm">© ২০২৬ সহজ ডিজিটাল সেবা। সর্বস্বত্ব সংরক্ষিত।</p>
+          <p className="text-violet-400 text-sm">© ২০২৬ সহজ ডিজিটাল সেবা। সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex gap-4 text-xs text-gray-400">
             <Link href="/privacy" className="hover:text-violet-300">গোপনীয়তা নীতি</Link>
             <Link href="/terms" className="hover:text-violet-300">শর্তাবলী</Link>
