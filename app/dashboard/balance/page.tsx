@@ -41,6 +41,7 @@ export default function BalancePage() {
             {
                 user_id: session.user.id,
                 amount: Number(depositAmount),
+                type: 'recharge',
                 trx_id: trxId,
                 method: method,
                 status: 'pending',

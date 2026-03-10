@@ -12,6 +12,7 @@ export type Profile = {
   email: string
   nid?: string
   balance: number
+  role?: string
   is_active: boolean
   created_at: string
 }

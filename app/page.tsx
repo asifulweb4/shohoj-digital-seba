@@ -33,10 +33,20 @@ export default function HomePage() {
                 <span className="w-2.5 h-2.5 bg-[#c026d3] rounded-full animate-pulse shadow-[0_0_10px_rgb(192,38,211)]"></span>
                 <span className="font-bold tracking-wide">🇧🇩 সহজ ডিজিটাল সেবা প্ল্যাটফর্ম</span>
               </div>
-              <h1 className="text-5xl sm:text-6xl font-black leading-tight mb-8 drop-shadow-lg tracking-tight">
+              {/*<h1 className="text-5xl sm:text-6xl font-black leading-tight mb-8 drop-shadow-lg tracking-tight">
                 সকল সরকারি সেবা
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-[#c026d3] drop-shadow-none py-2">এক জায়গায়</span>
-              </h1>
+              </h1>*/}
+              <div className="grid grid-cols-2 gap-4 animate-slide-up">
+                {stats.map((stat, i) => (
+                  <div key={i} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-7 text-center transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_15px_40px_rgb(255,255,255,0.15)] group">
+                    <div className="text-4xl mb-4 transform group-hover:scale-125 transition-transform">{stat.icon}</div>
+                    <div className="text-3xl font-black text-white drop-shadow-md">{stat.value}</div>
+                    <div className="text-violet-100 font-medium text-sm mt-2">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+              <br />
               <p className="text-violet-50 text-xl leading-relaxed mb-10 font-medium max-w-xl opacity-90">
                 NID, স্মার্টকার্ড, TIN, জন্ম নিবন্ধন সহ ৪২টিরও বেশি সরকারি সেবা এখন আপনার হাতের মুঠোয়।
               </p>
@@ -54,7 +64,7 @@ export default function HomePage() {
                 <span className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"><CheckCircle size={18} className="text-[#c026d3]" /> তাৎক্ষণিক ফলাফল</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 animate-slide-up">
+            {/*<div className="grid grid-cols-2 gap-4 animate-slide-up">
               {stats.map((stat, i) => (
                 <div key={i} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-7 text-center transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_15px_40px_rgb(255,255,255,0.15)] group">
                   <div className="text-4xl mb-4 transform group-hover:scale-125 transition-transform">{stat.icon}</div>
@@ -62,7 +72,7 @@ export default function HomePage() {
                   <div className="text-violet-100 font-medium text-sm mt-2">{stat.label}</div>
                 </div>
               ))}
-            </div>
+            </div>*/}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 w-full">

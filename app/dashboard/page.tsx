@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Home, Menu, X, LogOut, User, Search, Bell, Wallet, Settings, Clock, Send, LogIn, UserPlus } from 'lucide-react'
+import { Home, Menu, X, LogOut, User, Search, Bell, Wallet, Settings, Clock, Send, LogIn, UserPlus, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import { services, categories } from '@/lib/services'
@@ -67,6 +67,7 @@ export default function DashboardPage() {
       {
         user_id: profile?.id,
         amount: Number(depositAmount),
+        type: 'recharge',
         trx_id: trxId,
         method: method,
         status: 'pending'
@@ -185,6 +186,11 @@ export default function DashboardPage() {
                 <item.icon size={18} /> {item.label}
               </Link>
             ))}
+            {profile?.role === 'admin' && (
+              <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-amber-400 hover:bg-amber-500/10 transition text-sm font-bold border border-amber-500/20">
+                <ShieldCheck size={18} /> এডমিন প্যানেল
+              </Link>
+            )}
           </nav>
           <div className="p-4 border-t border-[#7c3aed]">
             {isGuest ? (

@@ -2,20 +2,30 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Menu, X, Phone, LogIn, UserPlus, LogOut, LayoutDashboard } from 'lucide-react'
+import { Menu, X, Phone, LogIn, UserPlus, LogOut, LayoutDashboard, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export default function Navbar() {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
+    const getProfile = async (uid: string) => {
+      const { data } = await supabase.from('profiles').select('role').eq('id', uid).single()
+      setProfile(data)
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      if (session?.user) getProfile(session.user.id)
     })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) getProfile(session.user.id)
+      else setProfile(null)
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -33,7 +43,7 @@ export default function Navbar() {
           <span className="hidden sm:block">🇧🇩 বাংলাদেশের সহজ ডিজিটাল সেবা প্ল্যাটফর্ম</span>
           <div className="flex items-center gap-1 ml-auto">
             <Phone size={11} />
-            <a href="tel:01700000000" className="hover:text-violet-300 transition-colors">০১৭০০-০০০০০০</a>
+            <a href="tel:01611426959" className="hover:text-violet-300 transition-colors">01611426959</a>
           </div>
         </div>
       </div>
@@ -60,6 +70,11 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
+                {profile?.role === 'admin' && (
+                  <Link href="/admin" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white font-medium text-sm hover:bg-amber-600 transition-all shadow-md">
+                    <ShieldCheck size={16} /> এডমিন প্যানেল
+                  </Link>
+                )}
                 <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-lg btn-primary text-white font-medium text-sm">
                   <LayoutDashboard size={16} /> ড্যাশবোর্ড
                 </Link>
@@ -94,6 +109,9 @@ export default function Navbar() {
           <div className="flex gap-3 pt-2">
             {user ? (
               <>
+                {profile?.role === 'admin' && (
+                  <Link href="/admin" className="flex-1 text-center py-2.5 rounded-lg bg-amber-500 text-white font-medium text-sm" onClick={() => setIsOpen(false)}>এডমিন প্যানেল</Link>
+                )}
                 <Link href="/dashboard" className="flex-1 text-center py-2.5 rounded-lg btn-primary text-white font-medium text-sm" onClick={() => setIsOpen(false)}>ড্যাশবোর্ড</Link>
                 <button onClick={handleLogout} className="flex-1 text-center py-2.5 rounded-lg border border-red-400 text-red-500 font-medium text-sm">লগআউট</button>
               </>
