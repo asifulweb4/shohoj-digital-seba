@@ -81,24 +81,24 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#2e1065] via-[#7c3aed] to-[#a855f7] pt-20 pb-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#2e1065] via-[#7c3aed] to-[#a855f7] pt-12 pb-24 sm:pt-20 sm:pb-32">
         {/* blobs */}
         <div className="absolute top-0 left-0 w-80 h-80 rounded-full bg-white opacity-10 blur-[120px] -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-[480px] h-[480px] rounded-full bg-violet-300 opacity-20 blur-[160px] translate-x-1/4 translate-y-1/4" />
 
         <div className="relative max-w-3xl mx-auto px-4 text-center text-white">
-          <h1 className="text-5xl sm:text-6xl font-black mb-4 drop-shadow-lg leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-3 sm:mb-4 drop-shadow-lg leading-tight lg:leading-tight animate-float">
             সহজ ডিজিটাল সেবা
           </h1>
-          <p className="text-violet-100 text-lg sm:text-xl mb-2 font-medium">
+          <p className="text-violet-100 text-sm sm:text-lg md:text-xl mb-1 sm:mb-2 font-medium">
             ৩ লাখ+ ব্যবহারকারী আমাদের সাথে যুক্ত
           </p>
-          <p className="text-violet-100 text-lg sm:text-xl mb-8 font-medium">
+          <p className="text-violet-100 text-sm sm:text-lg md:text-xl mb-6 sm:mb-8 font-medium">
             আজই ফ্রি একাউন্ট খুলুন
           </p>
           <Link
             href="/auth/register"
-            className="inline-block px-10 py-4 bg-gradient-to-r from-[#f97316] to-[#fb923c] text-white font-black rounded-full text-lg shadow-[0_6px_30px_rgba(249,115,22,0.5)] hover:shadow-[0_10px_40px_rgba(249,115,22,0.6)] hover:-translate-y-1 transition-all duration-300"
+            className="inline-block px-8 py-3 sm:px-10 sm:py-4 bg-gradient-to-r from-[#f97316] to-[#fb923c] text-white font-black rounded-full text-base sm:text-lg shadow-[0_6px_30px_rgba(249,115,22,0.5)] hover:shadow-[0_10px_40px_rgba(249,115,22,0.6)] hover:-translate-y-1 transition-all duration-300"
           >
             ফ্রি একাউন্ট খুলুন
           </Link>
@@ -113,16 +113,16 @@ export default function HomePage() {
       </section>
 
       {/* ── STATS ── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-4 -mt-16">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <section className="relative z-10 max-w-5xl mx-auto px-4 -mt-16 sm:-mt-16">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {stats.map((s, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-6 text-center shadow-[0_4px_30px_rgba(0,0,0,0.07)] hover:shadow-[0_10px_40px_rgba(124,58,237,0.12)] hover:-translate-y-1 transition-all duration-300 border border-gray-100"
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_15px_45px_rgba(124,58,237,0.25)] hover:bg-gradient-to-br hover:from-[#7c3aed] hover:to-[#9333ea] hover:border-transparent hover:-translate-y-1.5 transition-all duration-300 border border-gray-100 relative group overflow-hidden"
             >
-              <div className="text-3xl mb-2">{s.icon}</div>
-              <div className="text-2xl font-black text-gray-800">{s.value}</div>
-              <div className="text-gray-500 text-sm mt-1 font-medium">{s.label}</div>
+              <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{s.icon}</div>
+              <div className="text-lg sm:text-2xl font-black text-gray-800 group-hover:text-white leading-tight transition-colors">{s.value}</div>
+              <div className="text-gray-500 group-hover:text-violet-100 text-[11px] sm:text-sm mt-1 sm:mt-1 font-medium transition-colors">{s.label}</div>
             </div>
           ))}
         </div>
@@ -143,7 +143,7 @@ export default function HomePage() {
             <Link
               key={i}
               href="/dashboard"
-              className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_2px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(124,58,237,0.1)] hover:-translate-y-1 transition-all duration-300 flex items-start gap-4 group"
+              className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_45px_rgba(124,58,237,0.2)] hover:bg-gradient-to-br hover:from-violet-50 hover:to-fuchsia-50 hover:border-violet-200 hover:-translate-y-1.5 transition-all duration-300 flex items-start gap-4 group relative overflow-hidden"
             >
               <div className={`flex-shrink-0 w-12 h-12 ${cs.color} rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
                 {cs.icon}
@@ -212,7 +212,7 @@ export default function HomePage() {
             <Link
               key={s.id}
               href="/dashboard"
-              className="bg-white rounded-2xl p-5 text-center border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] hover:border-violet-200 hover:shadow-[0_10px_30px_rgba(124,58,237,0.1)] hover:-translate-y-1.5 transition-all duration-300 group"
+              className="bg-white rounded-2xl p-5 text-center border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(124,58,237,0.2)] hover:bg-gradient-to-b hover:from-violet-50/50 hover:to-violet-100/50 hover:border-violet-300 hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden"
             >
               <div className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm`}>
                 {s.icon}
@@ -269,7 +269,7 @@ export default function HomePage() {
             { icon: '📄', label: 'TIN সেবা' },
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center gap-2 text-gray-600 hover:text-violet-700 transition-colors group">
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl group-hover:shadow-md group-hover:-translate-y-0.5 transition-all">
+              <div className="w-12 h-12 bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 flex items-center justify-center text-2xl group-hover:bg-gradient-to-br group-hover:from-violet-100 group-hover:to-fuchsia-100 group-hover:border-violet-200 group-hover:shadow-[0_8px_25px_rgba(124,58,237,0.15)] group-hover:-translate-y-1 transition-all duration-300">
                 {item.icon}
               </div>
               <span className="text-xs font-bold">{item.label}</span>

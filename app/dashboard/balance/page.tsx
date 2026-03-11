@@ -128,7 +128,7 @@ export default function BalancePage() {
                     {/* Payment Numbers Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
                         {/* bKash */}
-                        <div className="bg-pink-50/50 border border-pink-100 p-5 rounded-2xl hover:border-pink-300 hover:shadow-sm transition-all">
+                        <div className="bg-pink-50/30 border border-pink-100/50 p-5 rounded-2xl hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 hover:border-pink-300 hover:shadow-[0_8px_30px_rgba(226,19,110,0.15)] hover:-translate-y-1 transition-all duration-300 relative group">
                             <p className="text-[#e2136e] text-xs font-bold mb-2 uppercase tracking-tight">bKash (Personal)</p>
                             <div className="flex items-center justify-between">
                                 <span className="text-xl font-bold tracking-wider text-gray-800">{paymentNumbers.bKash}</span>
@@ -143,7 +143,7 @@ export default function BalancePage() {
                         </div>
 
                         {/* Nagad */}
-                        <div className="bg-orange-50/50 border border-orange-100 p-5 rounded-2xl hover:border-orange-300 hover:shadow-sm transition-all">
+                        <div className="bg-orange-50/30 border border-orange-100/50 p-5 rounded-2xl hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 hover:border-orange-300 hover:shadow-[0_8px_30px_rgba(247,148,29,0.15)] hover:-translate-y-1 transition-all duration-300 relative group">
                             <p className="text-[#f7941d] text-xs font-bold mb-2 uppercase tracking-tight">Nagad (Personal)</p>
                             <div className="flex items-center justify-between">
                                 <span className="text-xl font-bold tracking-wider text-gray-800">{paymentNumbers.Nagad}</span>

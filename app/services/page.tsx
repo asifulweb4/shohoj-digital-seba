@@ -39,7 +39,7 @@ export default function ServicesPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredServices.map(s => (
-            <Link key={s.id} href="/auth/register" className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 service-card group">
+            <Link key={s.id} href="/auth/register" className="bg-white rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 hover:shadow-[0_15px_40px_rgba(124,58,237,0.2)] hover:bg-gradient-to-br hover:from-violet-50 hover:to-fuchsia-50 hover:border-violet-200 hover:-translate-y-1.5 transition-all duration-300 service-card group relative overflow-hidden">
               <div className="flex items-start gap-4">
                 <div className={`w-12 h-12 ${s.color} rounded-xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform`}>{s.icon}</div>
                 <div className="flex-1">
