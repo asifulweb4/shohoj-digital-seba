@@ -1,10 +1,68 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import { services, categories, stats } from '@/lib/services'
-import { Search, ArrowRight, CheckCircle, Star, Zap, Shield, Clock } from 'lucide-react'
+import { services, categories } from '@/lib/services'
+import { Search } from 'lucide-react'
+
+const stats = [
+  { icon: '⚡', value: '৪২+', label: 'মোট সেবা সংখ্যা' },
+  { icon: '👥', value: '৩,৩৯,৭১৪', label: 'মোট ব্যবহারকারী' },
+  { icon: '👤', value: '৭,৬২৯', label: 'মোট উদ্যোক্তা' },
+  { icon: '🏢', value: '৩২৯', label: 'মোট সেন্টার' },
+]
+
+const coreServices = [
+  {
+    icon: '🪪',
+    title: 'NID সেবা',
+    desc: 'ভোটার আইডি কার্ড তৈরি ও হারানো আইডি কার্ড ডাউনলোড করুন',
+    color: 'bg-blue-100 text-blue-600',
+  },
+  {
+    icon: '💳',
+    title: 'স্মার্টকার্ড সেবা',
+    desc: 'স্মার্টকার্ড ডাউনলোড এবং আপগ্রেড করতে আবেদন করুন',
+    color: 'bg-teal-100 text-teal-600',
+  },
+  {
+    icon: '📋',
+    title: 'জন্ম নিবন্ধন সেবা',
+    desc: 'অনলাইনে জন্ম নিবন্ধন সনদ ডাউনলোড এবং সংশোধন করুন',
+    color: 'bg-pink-100 text-pink-600',
+  },
+  {
+    icon: '📄',
+    title: 'TIN সেবা',
+    desc: 'ইলেক্ট্রনিক ট্যাক্স আইডেন্টিফিকেশন নম্বর রেজিস্ট্রেশন ও ডাউনলোড করুন',
+    color: 'bg-green-100 text-green-600',
+  },
+]
+
+const whyUs = [
+  {
+    icon: '🛡️',
+    title: 'সরল ও দ্রুত প্রক্রিয়া',
+    desc: 'আমাদের অনলাইন প্ল্যাটফর্ম ব্যবহার করে ঘরে বসেই আবেদন করুন',
+  },
+  {
+    icon: '🎧',
+    title: '২৪/৭ গ্রাহক সেবা',
+    desc: 'আমাদের দক্ষ সাপোর্ট টিম সর্বদা আপনার পাশে থেকে সেবা দিতে প্রস্তুত',
+  },
+  {
+    icon: '👍',
+    title: 'নির্ভরযোগ্য ও নিরাপদ',
+    desc: 'আমাদের নিরাপদ প্ল্যাটফর্ম আপনার পরিচয়পত্র ও তথ্য সুরক্ষিত রাখে',
+  },
+  {
+    icon: '🏆',
+    title: 'TIN সেবা',
+    desc: 'আমাদের বিশেষ টিন সেবা গ্রহণ করে অংশীদারদের সুবিধা উপভোগ করুন',
+  },
+]
 
 export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState('all')
@@ -12,135 +70,155 @@ export default function HomePage() {
 
   const filteredServices = services.filter(s => {
     const matchCat = activeCategory === 'all' || s.category === activeCategory
-    const matchSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.titleEn.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchSearch =
+      s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.titleEn.toLowerCase().includes(searchQuery.toLowerCase())
     return matchCat && matchSearch
   })
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-[#f8fafc] font-sans">
       <Navbar />
 
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#2e1065] via-[#7c3aed] to-[#8b5cf6]">
-        <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-96 h-96 rounded-full bg-white opacity-10 blur-[120px]"></div>
-          <div className="absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full bg-violet-200 opacity-20 blur-[150px]"></div>
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#2e1065] via-[#7c3aed] to-[#a855f7] pt-20 pb-32">
+        {/* blobs */}
+        <div className="absolute top-0 left-0 w-80 h-80 rounded-full bg-white opacity-10 blur-[120px] -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 right-0 w-[480px] h-[480px] rounded-full bg-violet-300 opacity-20 blur-[160px] translate-x-1/4 translate-y-1/4" />
+
+        <div className="relative max-w-3xl mx-auto px-4 text-center text-white">
+          <h1 className="text-5xl sm:text-6xl font-black mb-4 drop-shadow-lg leading-tight">
+            সহজ ডিজিটাল সেবা
+          </h1>
+          <p className="text-violet-100 text-lg sm:text-xl mb-2 font-medium">
+            ৩ লাখ+ ব্যবহারকারী আমাদের সাথে যুক্ত
+          </p>
+          <p className="text-violet-100 text-lg sm:text-xl mb-8 font-medium">
+            আজই ফ্রি একাউন্ট খুলুন
+          </p>
+          <Link
+            href="/auth/register"
+            className="inline-block px-10 py-4 bg-gradient-to-r from-[#f97316] to-[#fb923c] text-white font-black rounded-full text-lg shadow-[0_6px_30px_rgba(249,115,22,0.5)] hover:shadow-[0_10px_40px_rgba(249,115,22,0.6)] hover:-translate-y-1 transition-all duration-300"
+          >
+            ফ্রি একাউন্ট খুলুন
+          </Link>
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white animate-fade-in relative z-10">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-5 py-2.5 mb-8 text-sm border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-                <span className="w-2.5 h-2.5 bg-[#c026d3] rounded-full animate-pulse shadow-[0_0_10px_rgb(192,38,211)]"></span>
-                <span className="font-bold tracking-wide">🇧🇩 সহজ ডিজিটাল সেবা প্ল্যাটফর্ম</span>
-              </div>
-              {/*<h1 className="text-5xl sm:text-6xl font-black leading-tight mb-8 drop-shadow-lg tracking-tight">
-                সকল সরকারি সেবা
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-[#c026d3] drop-shadow-none py-2">এক জায়গায়</span>
-              </h1>*/}
-              <div className="grid grid-cols-2 gap-4 animate-slide-up">
-                {stats.map((stat, i) => (
-                  <div key={i} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-7 text-center transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_15px_40px_rgb(255,255,255,0.15)] group">
-                    <div className="text-4xl mb-4 transform group-hover:scale-125 transition-transform">{stat.icon}</div>
-                    <div className="text-3xl font-black text-white drop-shadow-md">{stat.value}</div>
-                    <div className="text-violet-100 font-medium text-sm mt-2">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-              <br />
-              <p className="text-violet-50 text-xl leading-relaxed mb-10 font-medium max-w-xl opacity-90">
-                NID, স্মার্টকার্ড, TIN, জন্ম নিবন্ধন সহ ৪২টিরও বেশি সরকারি সেবা এখন আপনার হাতের মুঠোয়।
-              </p>
-              <div className="flex flex-col sm:flex-row gap-5">
-                <Link href="/dashboard" className="flex items-center justify-center gap-3 px-10 py-4.5 bg-white text-[#2e1065] font-black rounded-2xl hover:bg-violet-50 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:shadow-[0_15px_40px_rgb(124,58,237,0.3)] hover:-translate-y-1 text-lg group">
-                  সেবা দেখুন <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link href="/auth/login" className="flex items-center justify-center gap-3 px-10 py-4.5 bg-white/10 backdrop-blur-xl text-white font-bold rounded-2xl hover:bg-white/20 transition-all border border-white/20 shadow-lg hover:-translate-y-1 text-lg">
-                  লগইন করুন
-                </Link>
-              </div>
-              <div className="flex flex-wrap gap-5 mt-10 text-sm text-violet-100 font-medium">
-                <span className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"><CheckCircle size={18} className="text-[#c026d3]" /> ১০০% নিরাপদ</span>
-                <span className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"><CheckCircle size={18} className="text-[#c026d3]" /> ২৪/৭ সেবা</span>
-                <span className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"><CheckCircle size={18} className="text-[#c026d3]" /> তাৎক্ষণিক ফলাফল</span>
-              </div>
-            </div>
-            {/*<div className="grid grid-cols-2 gap-4 animate-slide-up">
-              {stats.map((stat, i) => (
-                <div key={i} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-7 text-center transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_15px_40px_rgb(255,255,255,0.15)] group">
-                  <div className="text-4xl mb-4 transform group-hover:scale-125 transition-transform">{stat.icon}</div>
-                  <div className="text-3xl font-black text-white drop-shadow-md">{stat.value}</div>
-                  <div className="text-violet-100 font-medium text-sm mt-2">{stat.label}</div>
-                </div>
-              ))}
-            </div>*/}
-          </div>
-        </div>
+
+        {/* wave */}
         <div className="absolute bottom-0 left-0 w-full">
-          <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f8fafc" />
+          <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,35 C360,70 1080,0 1440,35 L1440,70 L0,70 Z" fill="#f8fafc" />
           </svg>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: <Zap className="text-amber-500" size={36} />, title: 'দ্রুত সেবা', desc: 'মাত্র কয়েক মিনিটের মধ্যে আপনার প্রয়োজনীয় সেবা পান', color: 'from-amber-50 to-orange-50' },
-            { icon: <Shield className="text-[#7c3aed]" size={36} />, title: 'সম্পূর্ণ নিরাপদ', desc: 'Supabase দ্বারা সুরক্ষিত। আপনার তথ্য সম্পূর্ণ গোপনীয়', color: 'from-violet-50 to-fuchsia-50' },
-            { icon: <Clock className="text-violet-500" size={36} />, title: '২৪/৭ সহায়তা', desc: 'দিনরাত যেকোনো সময় আমাদের সহায়তা পাওয়া যায়', color: 'from-violet-50 to-cyan-50' },
-          ].map((f, i) => (
-            <div key={i} className="bg-white/80 backdrop-blur-xl rounded-[2rem] p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(124,58,237,0.08)] border border-white hover:-translate-y-2 transition-all duration-300 text-center group">
-              <div className={`w-20 h-20 rounded-[1.5rem] bg-gradient-to-br ${f.color} flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-inner`}>{f.icon}</div>
-              <h3 className="text-2xl font-black text-gray-800 mb-3">{f.title}</h3>
-              <p className="text-gray-500 text-base leading-relaxed font-medium">{f.desc}</p>
+      {/* ── STATS ── */}
+      <section className="relative z-10 max-w-5xl mx-auto px-4 -mt-16">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {stats.map((s, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl p-6 text-center shadow-[0_4px_30px_rgba(0,0,0,0.07)] hover:shadow-[0_10px_40px_rgba(124,58,237,0.12)] hover:-translate-y-1 transition-all duration-300 border border-gray-100"
+            >
+              <div className="text-3xl mb-2">{s.icon}</div>
+              <div className="text-2xl font-black text-gray-800">{s.value}</div>
+              <div className="text-gray-500 text-sm mt-1 font-medium">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* POPULAR */}
-      <section className="py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Star className="text-yellow-500" size={24} fill="currentColor" />
-          <h2 className="text-2xl font-bold text-gray-800">জনপ্রিয় সেবাসমূহ</h2>
+      {/* ── CORE SERVICES ── */}
+      <section className="max-w-5xl mx-auto px-4 py-16">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl sm:text-3xl font-black text-gray-800">
+            NID, স্মার্টকার্ড, TIN, জন্ম নিবন্ধন সহ
+          </h2>
+          <p className="text-gray-500 mt-2 text-base font-medium">
+            ৪২টিরও বেশি সরকারি সেবা এখন আপনার হাতের মুঠোয়
+          </p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {services.filter(s => s.popular).map(s => (
-            <Link key={s.id} href="/dashboard" className="bg-white/80 backdrop-blur-xl rounded-[1.5rem] p-5 text-center border border-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:border-violet-200 hover:shadow-[0_15px_35px_rgb(124,58,237,0.1)] hover:-translate-y-1.5 transition-all duration-300 group relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className={`relative z-10 w-16 h-16 ${s.color} rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 group-hover:scale-110 group-hover:rotate-[3deg] transition-transform duration-300 shadow-[0_4px_15px_rgb(0,0,0,0.1)]`}>{s.icon}</div>
-              <p className="relative z-10 text-sm font-bold text-gray-800 leading-tight">{s.title}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+          {coreServices.map((cs, i) => (
+            <Link
+              key={i}
+              href="/dashboard"
+              className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_2px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(124,58,237,0.1)] hover:-translate-y-1 transition-all duration-300 flex items-start gap-4 group"
+            >
+              <div className={`flex-shrink-0 w-12 h-12 ${cs.color} rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
+                {cs.icon}
+              </div>
+              <div>
+                <h3 className="font-black text-gray-800 mb-1">{cs.title}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed">{cs.desc}</p>
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* ALL SERVICES */}
-      <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── WHY US ── */}
+      <section className="bg-white py-16">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-black text-gray-800 text-center mb-10">
+            কেন আমাদের সেবা ব্যবহার করবেন?
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {whyUs.map((w, i) => (
+              <div key={i} className="group">
+                <div className="w-16 h-16 mx-auto bg-violet-50 rounded-2xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 group-hover:bg-violet-100 transition-all duration-300 shadow-sm">
+                  {w.icon}
+                </div>
+                <h3 className="font-black text-gray-800 text-sm mb-2">{w.title}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed">{w.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ALL SERVICES ── */}
+      <section className="py-12 max-w-6xl mx-auto px-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">সকল সেবাসমূহ</h2>
           <div className="relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="সেবা খুঁজুন..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-white text-sm w-56" />
+            <input
+              type="text"
+              placeholder="সেবা খুঁজুন..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-white text-sm w-56 focus:outline-none focus:ring-2 focus:ring-violet-300"
+            />
           </div>
         </div>
-
         <div className="flex gap-3 flex-wrap mb-8">
           {categories.map(cat => (
-            <button key={cat.id} onClick={() => setActiveCategory(cat.id)} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md ${activeCategory === cat.id ? 'bg-[#7c3aed] text-white shadow-[0_4px_15px_rgb(124,58,237,0.3)] scale-105' : 'bg-white/80 backdrop-blur-md text-gray-600 border border-white hover:border-[#7c3aed]/30 hover:text-[#7c3aed]'}`}>
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md ${
+                activeCategory === cat.id
+                  ? 'bg-[#7c3aed] text-white shadow-[0_4px_15px_rgb(124,58,237,0.3)] scale-105'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:text-[#7c3aed]'
+              }`}
+            >
               {cat.icon} {cat.label}
             </button>
           ))}
         </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {filteredServices.map(s => (
-            <Link key={s.id} href="/dashboard" className="bg-white/80 backdrop-blur-xl rounded-[1.5rem] p-5 text-center border border-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:border-violet-200 hover:shadow-[0_15px_35px_rgb(124,58,237,0.1)] hover:-translate-y-1.5 transition-all duration-300 group relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className={`relative z-10 w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 group-hover:rotate-[3deg] transition-transform duration-300 shadow-[0_4px_15px_rgb(0,0,0,0.1)]`}>{s.icon}</div>
-              <p className="relative z-10 text-sm font-bold text-gray-800 leading-tight mb-2 line-clamp-2">{s.title}</p>
-              <div className="relative z-10 inline-flex items-center justify-center bg-gradient-to-r from-violet-50 to-fuchsia-50 text-[#7c3aed] px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide border border-violet-100/60 shadow-inner">
+            <Link
+              key={s.id}
+              href="/dashboard"
+              className="bg-white rounded-2xl p-5 text-center border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] hover:border-violet-200 hover:shadow-[0_10px_30px_rgba(124,58,237,0.1)] hover:-translate-y-1.5 transition-all duration-300 group"
+            >
+              <div className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm`}>
+                {s.icon}
+              </div>
+              <p className="text-sm font-bold text-gray-800 leading-tight mb-2 line-clamp-2">{s.title}</p>
+              <div className="inline-flex items-center bg-violet-50 text-[#7c3aed] px-2.5 py-1 rounded-full text-[10px] font-black border border-violet-100">
                 <span className="mr-0.5 opacity-60">৳</span> {s.price}
               </div>
             </Link>
@@ -148,15 +226,55 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-gradient-to-r from-[#4c1d95] to-[#7c3aed] my-12 mx-4 sm:mx-8 rounded-3xl relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10"><div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-white blur-3xl"></div></div>
-        <div className="relative text-center text-white max-w-2xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">আজই শুরু করুন</h2>
-          <p className="text-violet-100 text-lg mb-8">বিনামূল্যে অ্যাকাউন্ট খুলুন এবং সকল সরকারি সেবা উপভোগ করুন</p>
-          <Link href="/dashboard" className="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#7c3aed] font-bold rounded-xl hover:bg-violet-50 transition-all shadow-lg text-lg">
-            সেবাসমূহ দেখুন <ArrowRight size={20} />
-          </Link>
+      {/* ── BOTTOM CTA ── */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#4c1d95] via-[#7c3aed] to-[#a855f7] my-12 mx-4 sm:mx-8 rounded-3xl">
+        <div className="flex flex-col lg:flex-row items-center justify-between px-8 sm:px-14 py-14 gap-10">
+          {/* Text */}
+          <div className="text-white max-w-md">
+            <h2 className="text-3xl sm:text-4xl font-black mb-3 leading-tight">
+              তাহলে আর দেরি কেন?
+            </h2>
+            <p className="text-violet-100 text-lg mb-8 font-medium">
+              আজই সহজ ডিজিটাল সেবায় আকাউন্ট খুলুন!
+            </p>
+            <Link
+              href="/auth/register"
+              className="inline-block px-10 py-4 bg-gradient-to-r from-[#f97316] to-[#fb923c] text-white font-black rounded-full text-lg shadow-[0_6px_30px_rgba(249,115,22,0.5)] hover:shadow-[0_10px_40px_rgba(249,115,22,0.6)] hover:-translate-y-1 transition-all duration-300"
+            >
+              ফ্রি একাউন্ট খুলুন
+            </Link>
+          </div>
+          {/* Image */}
+          <div className="relative flex-shrink-0 w-64 sm:w-80">
+            <Image
+              src="/woman-cta.png"
+              alt="সহজ ডিজিটাল সেবা"
+              width={320}
+              height={400}
+              className="object-contain drop-shadow-2xl"
+            />
+          </div>
+        </div>
+        {/* Decorative blob */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white opacity-5 blur-3xl translate-x-1/3 -translate-y-1/3" />
+      </section>
+
+      {/* ── FOOTER SERVICE ICONS ── */}
+      <section className="pb-6 max-w-5xl mx-auto px-4">
+        <div className="flex flex-wrap justify-center gap-8">
+          {[
+            { icon: '🪪', label: 'NID সেবা' },
+            { icon: '💳', label: 'স্মার্টকার্ড সেবা' },
+            { icon: '📋', label: 'জন্ম নিবন্ধন সেবা' },
+            { icon: '📄', label: 'TIN সেবা' },
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 text-gray-600 hover:text-violet-700 transition-colors group">
+              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-2xl group-hover:shadow-md group-hover:-translate-y-0.5 transition-all">
+                {item.icon}
+              </div>
+              <span className="text-xs font-bold">{item.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
