@@ -118,12 +118,21 @@ export default function HomePage() {
           {stats.map((s, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_15px_45px_rgba(124,58,237,0.25)] hover:bg-gradient-to-br hover:from-[#7c3aed] hover:to-[#9333ea] hover:border-transparent hover:-translate-y-1.5 transition-all duration-300 border border-gray-100 relative group overflow-hidden"
+              className="bg-orange-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center 
+             shadow-[0_4px_30px_rgba(0,0,0,0.04)] 
+             hover:shadow-[0_15px_45px_rgba(251,146,60,0.35)]
+             hover:-translate-y-1.5 transition-all duration-300 
+             relative group overflow-hidden"
             >
               <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{s.icon}</div>
-              <div className="text-lg sm:text-2xl font-black text-gray-800 group-hover:text-white leading-tight transition-colors">{s.value}</div>
-              <div className="text-gray-500 group-hover:text-violet-100 text-[11px] sm:text-sm mt-1 sm:mt-1 font-medium transition-colors">{s.label}</div>
+              <div className="text-lg sm:text-2xl font-black text-gray-800 leading-tight transition-colors">
+                {s.value}
+              </div>
+              <div className="text-gray-500 text-[11px] sm:text-sm mt-1 sm:mt-1 font-medium transition-colors">
+                {s.label}
+              </div>
             </div>
+
           ))}
         </div>
       </section>
@@ -143,7 +152,7 @@ export default function HomePage() {
             <Link
               key={i}
               href="/dashboard"
-              className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_45px_rgba(124,58,237,0.2)] hover:bg-gradient-to-br hover:from-violet-50 hover:to-fuchsia-50 hover:border-violet-200 hover:-translate-y-1.5 transition-all duration-300 flex items-start gap-4 group relative overflow-hidden"
+              className="bg-white rounded-2xl p-5 border  shadow-[0_4px_25px_rgba(0,0,0,0.03)] border-gray-200 hover:border-blue-400  hover:-translate-y-1.5 transition-all duration-300 flex items-start gap-4 group relative overflow-hidden"
             >
               <div className={`flex-shrink-0 w-12 h-12 ${cs.color} rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
                 {cs.icon}
@@ -197,11 +206,10 @@ export default function HomePage() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md ${
-                activeCategory === cat.id
-                  ? 'bg-[#7c3aed] text-white shadow-[0_4px_15px_rgb(124,58,237,0.3)] scale-105'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:text-[#7c3aed]'
-              }`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md ${activeCategory === cat.id
+                ? 'bg-[#7c3aed] text-white shadow-[0_4px_15px_rgb(124,58,237,0.3)] scale-105'
+                : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:text-[#7c3aed]'
+                }`}
             >
               {cat.icon} {cat.label}
             </button>
@@ -212,13 +220,16 @@ export default function HomePage() {
             <Link
               key={s.id}
               href="/dashboard"
-              className="bg-white rounded-2xl p-5 text-center border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(124,58,237,0.2)] hover:bg-gradient-to-b hover:from-violet-50/50 hover:to-violet-100/50 hover:border-violet-300 hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden"
+              className="bg-emerald-50 rounded-2xl p-5 text-center 
+                border border-emerald-100 
+                shadow-sm hover:shadow-lg hover:border-emerald-300 
+                transition-all duration-300 group relative overflow-hidden"
             >
               <div className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm`}>
                 {s.icon}
               </div>
               <p className="text-sm font-bold text-gray-800 leading-tight mb-2 line-clamp-2">{s.title}</p>
-              <div className="inline-flex items-center bg-violet-50 text-[#7c3aed] px-2.5 py-1 rounded-full text-[10px] font-black border border-violet-100">
+              <div className="inline-flex items-center  px-2.5 py-1 bg-violet-50 text-[#7c3aed] rounded-full text-[10px] font-black border border-violet-100">
                 <span className="mr-0.5 opacity-60">৳</span> {s.price}
               </div>
             </Link>
@@ -227,7 +238,7 @@ export default function HomePage() {
       </section>
 
       {/* ── BOTTOM CTA ── */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-[#4c1d95] via-[#7c3aed] to-[#a855f7] my-12 mx-4 sm:mx-8 rounded-3xl">
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#4c1d95] via-[#7c3aed] to-[#a855f7]  my-12 mx-4 sm:mx-8 rounded-3xl">
         <div className="flex flex-col lg:flex-row items-center justify-between px-8 sm:px-14 py-14 gap-10">
           {/* Text */}
           <div className="text-white max-w-md">

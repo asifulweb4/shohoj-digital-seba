@@ -135,14 +135,14 @@ export default function DashboardPage() {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1e0a4e] flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-r from-purple-600 to-indigo-700  flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
           <Link href="/" className="text-white font-black text-base leading-tight">
             সহজ ডিজিটাল সেবা
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/70 hover:text-white">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-black/40 hover:text-white">
             <X size={20} />
           </button>
         </div>
@@ -160,16 +160,27 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="bg-gradient-to-br from-violet-700 to-violet-500 rounded-2xl p-4 text-white shadow-lg">
-              <p className="text-[10px] text-white/70 font-medium mb-1">বর্তমান ব্যালেন্স</p>
-              <p className="text-3xl font-black mb-3">{profile?.balance || 0} ৳</p>
+            <div className="bg-gradient-to-r from-amber-400 to-orange-500 
+                rounded-2xl p-6 text-center text-white 
+                shadow-lg hover:shadow-xl transition-all duration-300">
+              <p className="text-xs text-violet-100 font-medium mb-1 tracking-wide">
+                বর্তমান ব্যালেন্স
+              </p>
+              <p className="text-3xl font-extrabold mb-4 drop-shadow-sm text-black">
+                {profile?.balance || 0} ৳
+              </p>
               <Link
                 href="/dashboard/balance"
-                className="block text-center w-full bg-white text-violet-800 py-2 rounded-xl text-xs font-black hover:bg-violet-50 transition-colors"
+                className="block text-center w-full bg-white text-orange-600 
+               py-2 rounded-xl text-sm font-bold 
+               hover:bg-orange-50 hover:text-orange-700 
+               transition-colors shadow-sm"
               >
                 রিচার্জ করুন
               </Link>
             </div>
+
+
           )}
         </div>
 
@@ -179,7 +190,7 @@ export default function DashboardPage() {
             <Link
               key={item.label}
               href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-violet-700/40 hover:text-white transition-all text-sm font-medium group"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:text-cyan-300 hover:bg-indigo-700/40 transition-all text-sm font-medium group"
             >
               <item.icon size={17} className="group-hover:text-violet-300 transition-colors" />
               {item.label}
@@ -202,7 +213,9 @@ export default function DashboardPage() {
               <LogIn size={17} /> লগিন / রেজিস্ট্রেশন
             </Link>
           ) : (
-            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition text-sm">
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 
+               hover:text-white 
+               hover:bg-rose-600/30    transition-colors duration-300 font-semibold">
               <LogOut size={17} /> লগআউট
             </button>
           )}
@@ -298,11 +311,10 @@ export default function DashboardPage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 border ${
-                  activeCategory === cat.id
-                    ? 'bg-[#7c3aed] text-white border-[#7c3aed] shadow-[0_4px_12px_rgba(124,58,237,0.35)]'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-violet-300 hover:text-violet-600'
-                }`}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 border ${activeCategory === cat.id
+                  ? 'bg-[#7c3aed] text-white border-[#7c3aed] shadow-[0_4px_12px_rgba(124,58,237,0.35)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-violet-300 hover:text-violet-600'
+                  }`}
               >
                 {cat.label}
               </button>
@@ -315,7 +327,11 @@ export default function DashboardPage() {
               <button
                 key={service.id}
                 onClick={() => setActiveService(service.id)}
-                className="bg-white rounded-3xl p-5 flex flex-col items-center text-center border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(124,58,237,0.15)] hover:border-violet-200 hover:-translate-y-1 transition-all duration-300 group"
+                className="bg-gradient-to-r from-violet-50 to-pink-100 
+                rounded-3xl p-5 flex flex-col items-center text-center 
+                border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.05)] 
+                hover:shadow-[0_8px_30px_rgba(124,58,237,0.15)] 
+                hover:border-violet-200 hover:-translate-y-1 transition-all duration-300 group"
               >
                 <div className={`w-16 h-16 ${service.color} rounded-2xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm`}>
                   {service.icon}
