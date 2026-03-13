@@ -1,4 +1,4 @@
-# ডিজিটাল শেবা বিডি - Supabase + Vercel Version
+# সহজ ডিজিটাল সেবা - Supabase + Vercel Version
 
 ## ✅ এই version এ যা আছে
 - Real Supabase Authentication (ইমেইল + পাসওয়ার্ড)
