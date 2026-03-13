@@ -80,7 +80,7 @@ export default function Footer() {
                 <Youtube size={17} />
               </a>
               <a
-                href="https://wa.me/8801611426959"
+                href=""
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all duration-300"
@@ -145,11 +145,11 @@ export default function Footer() {
                   <Phone size={15} className="text-violet-400" />
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <a href="tel:01611426959" className="text-gray-300 text-sm hover:text-violet-300 transition-colors font-medium">
-                    01611426959
+                  <a href="tel:" className="text-gray-300 text-sm hover:text-violet-300 transition-colors font-medium">
+
                   </a>
                   <a
-                    href="https://wa.me/8801611426959"
+                    href=""
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-green-400 hover:text-green-300 transition-colors flex items-center gap-1"
