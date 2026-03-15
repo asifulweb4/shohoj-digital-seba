@@ -140,7 +140,7 @@ export default function DashboardPage() {
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
           <Link href="/" className="text-white font-black text-base leading-tight">
-            সহজ ডিজিটাল সেবা
+            নাগরিক সেবা
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-black/40 hover:text-white">
             <X size={20} />
@@ -272,7 +272,7 @@ export default function DashboardPage() {
               {isGuest ? (
                 <>
                   <h2 className="text-2xl sm:text-3xl font-black mb-1 leading-tight">
-                    সহজ ডিজিটাল সেবায় স্বাগতম! 👋
+                    নাগরিক সেবায় স্বাগতম! 👋
                   </h2>
                   <p className="text-violet-100 text-sm mb-5 font-medium">
                     সেবা নিতে লগিন বা ফ্রি রেজিস্ট্রেশন করুন

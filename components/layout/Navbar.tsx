@@ -40,10 +40,10 @@ export default function Navbar() {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="bg-[#4c1d95] text-white text-xs py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <span className="hidden sm:block">🇧🇩 বাংলাদেশের সহজ ডিজিটাল সেবা প্ল্যাটফর্ম</span>
+          <span className="hidden sm:block">🇧🇩 বাংলাদেশের সহজ নাগরিক সেবা প্ল্যাটফর্ম</span>
           <div className="flex items-center gap-1 ml-auto">
             <Phone size={11} />
-            <a href="tel:01611426959" className="hover:text-violet-300 transition-colors">01611426959</a>
+            <a href="tel:01880119330" className="hover:text-violet-300 transition-colors">01880119330</a>
           </div>
         </div>
       </div>
@@ -52,11 +52,11 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#8b5cf6] flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">স</span>
+              <span className="text-white font-bold text-lg">ন</span>
             </div>
             <div>
-              <div className="text-[#7c3aed] font-bold text-lg leading-tight">সহজ ডিজিটাল সেবা</div>
-              <div className="text-gray-400 text-xs">Shohoj Digital Sheba</div>
+              <div className="text-[#7c3aed] font-bold text-lg leading-tight">নাগরিক সেবা</div>
+              <div className="text-gray-400 text-xs">Nagarik Sheba</div>
             </div>
           </Link>
 

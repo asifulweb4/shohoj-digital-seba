@@ -88,7 +88,7 @@ export default function HomePage() {
 
         <div className="relative max-w-3xl mx-auto px-4 text-center text-white">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-3 sm:mb-4 drop-shadow-lg leading-tight lg:leading-tight animate-float">
-            সহজ ডিজিটাল সেবা
+            নাগরিক সেবা
           </h1>
           <p className="text-violet-100 text-sm sm:text-lg md:text-xl mb-1 sm:mb-2 font-medium">
             ৩ লাখ+ ব্যবহারকারী আমাদের সাথে যুক্ত
@@ -259,7 +259,7 @@ export default function HomePage() {
           <div className="relative flex-shrink-0 w-64 sm:w-80">
             <Image
               src="/woman-cta.png"
-              alt="সহজ ডিজিটাল সেবা"
+              alt="নাগরিক সেবা"
               width={320}
               height={400}
               className="object-contain drop-shadow-2xl"
