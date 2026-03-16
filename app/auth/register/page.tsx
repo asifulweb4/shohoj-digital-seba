@@ -37,6 +37,19 @@ export default function RegisterPage() {
 
     setLoading(true)
 
+    // ১. আগে চেক করো ফোন নাম্বারটি ব্যবহার হয়েছে কি না
+    const { data: existingProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('phone', form.phone)
+      .maybeSingle()
+
+    if (existingProfile) {
+      setError('এই মোবাইল নম্বর দিয়ে আগেই রেজিস্ট্রেশন করা হয়েছে')
+      setLoading(false)
+      return
+    }
+
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
@@ -52,6 +65,8 @@ export default function RegisterPage() {
     if (signUpError) {
       if (signUpError.message.includes('already registered')) {
         setError('এই ইমেইল দিয়ে আগেই রেজিস্ট্রেশন করা হয়েছে')
+      } else if (signUpError.message.includes('Database error saving new user')) {
+        setError('ডাটাবেজ এ সেভ করতে সমস্যা হচ্ছে। এই মোবাইল বা ইমেইল আগে ব্যবহার হয়ে থাকতে পারে।')
       } else {
         setError(signUpError.message)
       }
