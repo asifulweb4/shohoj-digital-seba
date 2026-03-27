@@ -70,6 +70,7 @@ export default function DashboardPage() {
   }
 
   const handlePlaceOrder = async (service: any) => {
+
     if (!orderInput) return alert('প্রয়োজনীয় তথ্য (NID/নাম্বার) দিন')
     if ((profile?.balance || 0) < service.price) {
       alert('আপনার পর্যাপ্ত ব্যালেন্স নেই! ব্যালেন্স যোগ করার পেজে নিয়ে যাওয়া হচ্ছে।')
@@ -423,12 +424,12 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="mb-5">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">প্রয়োজনীয় তথ্য (NID / নাম্বার / লিঙ্ক)</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">{s.inputLabel || 'প্রয়োজনীয় তথ্য'}</label>
                     <input
                       type="text"
                       value={orderInput}
                       onChange={e => setOrderInput(e.target.value)}
-                      placeholder="এখানে লিখুন..."
+                      placeholder={s.inputPlaceholder || 'এখানে লিখুন...'}
                       className="w-full p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 focus:ring-2 focus:ring-violet-400 text-sm"
                     />
                   </div>

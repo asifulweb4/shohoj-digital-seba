@@ -275,7 +275,9 @@ export default function AdminPage() {
                                             </td>
                                             <td style={{ padding: '12px 14px', fontSize: 13 }}>{o.service_name || '—'}</td>
                                             <td style={{ padding: '12px 14px', fontSize: 12, color: '#6b7280', maxWidth: 150 }}>
-                                                {o.input_data?.substring(0, 40)}{o.input_data?.length > 40 ? '...' : ''}
+                                                {typeof o.input_data === 'string'
+                                                    ? o.input_data.substring(0, 40) + (o.input_data.length > 40 ? '...' : '')
+                                                    : JSON.stringify(o.input_data)?.substring(0, 40) + '...'}
                                             </td>
                                             <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#7c3aed' }}>৳{o.price}</td>
                                             <td style={{ padding: '12px 14px' }}>
