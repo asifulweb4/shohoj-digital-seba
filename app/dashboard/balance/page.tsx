@@ -17,7 +17,7 @@ export default function BalancePage() {
 
     const paymentNumbers = {
         bKash: '01701886113',
-        Nagad: ''
+        Nagad: '01747156607'
     }
 
     const handleCopy = (num: string, type: string) => {
