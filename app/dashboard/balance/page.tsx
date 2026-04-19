@@ -16,7 +16,7 @@ export default function BalancePage() {
     const router = useRouter()
 
     const paymentNumbers = {
-        bKash: '01799942593',
+        bKash: '01745376952',
         Nagad: '01747156607'
     }
 
