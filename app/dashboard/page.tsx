@@ -4,103 +4,60 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Home, Menu, X, LogOut, User, Search, Bell,
-  Wallet, Settings, Clock, Send, LogIn, UserPlus, ShieldCheck
+  Wallet, Settings, Clock, Send, LogIn, UserPlus, ShieldCheck,
+  ChevronRight, Star, Zap, TrendingUp, Award
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
-import type { Profile } from '@/lib/supabase'
+import { getProfile, placeOrderAction, logoutAction } from '@/lib/actions'
 import { services, categories } from '@/lib/services'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<any>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeService, setActiveService] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isGuest, setIsGuest] = useState(false)
-
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
-  const [depositAmount, setDepositAmount] = useState('')
-  const [trxId, setTrxId] = useState('')
-  const [method, setMethod] = useState('bKash')
   const [orderInput, setOrderInput] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push('/')
+    const fetchProfile = async () => {
+      const profileData = await getProfile()
+      if (!profileData) {
+        router.push('/auth/login')
         return
       }
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
-      const fullName = profileData?.full_name || session.user.user_metadata?.full_name || 'User'
-      setProfile({ ...profileData, full_name: fullName })
-      setIsGuest(false)
+      setProfile(profileData as any)
       setLoading(false)
     }
-    getUser()
+    fetchProfile()
   }, [router])
 
-  const handleAddBalance = async () => {
-    if (!depositAmount || !trxId) return alert('টাকার পরিমাণ এবং TrxID দিন')
-    setSubmitting(true)
-    const { data, error } = await supabase.rpc('auto_approve_recharge', {
-      p_amount: Number(depositAmount),
-      p_trx_id: trxId.trim().toUpperCase(),
-      p_method: method,
-      p_description: `Quick recharge via ${method}`,
-      p_account_type: 'Personal',
-    })
-    setSubmitting(false)
-    if (error || (data && !data.success)) {
-      alert(data?.message || error?.message || 'এই TrxID টি আগে ব্যবহার হয়েছে অথবা ভুল!')
-    } else {
-      alert('✅ ব্যালেন্স সফলভাবে যোগ হয়েছে!')
-      setPaymentModalOpen(false)
-      setTrxId('')
-      setDepositAmount('')
-      window.location.reload()
-    }
-  }
-
   const handlePlaceOrder = async (service: any) => {
-
     if (!orderInput) return alert('প্রয়োজনীয় তথ্য (NID/নাম্বার) দিন')
     if ((profile?.balance || 0) < service.price) {
       alert('আপনার পর্যাপ্ত ব্যালেন্স নেই! ব্যালেন্স যোগ করার পেজে নিয়ে যাওয়া হচ্ছে।')
-      router.push('/dashboard/balance')
-      return
+      router.push('/dashboard/balance'); return
     }
     setSubmitting(true)
-    const { data, error: rpcError } = await supabase.rpc('place_order', {
-      p_service_id: service.id,
-      p_service_name: service.title,
-      p_price: service.price,
-      p_input_data: orderInput,
-    })
-    if (rpcError || (data && !data.success)) {
-      alert(rpcError?.message || data?.message || 'অর্ডার করতে সমস্যা হয়েছে।')
+    const res = await placeOrderAction(service, orderInput)
+    if (!res.success) {
+      alert(res.message)
     } else {
       alert('অর্ডার সফল হয়েছে!')
-      setActiveService(null)
-      setOrderInput('')
+      setActiveService(null); setOrderInput('')
       window.location.reload()
     }
     setSubmitting(false)
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await logoutAction()
     router.push('/auth/login')
   }
 
-  const filteredServices = services.filter(s => {
+  const filteredServices = services.filter((s: any) => {
     const matchCat = activeCategory === 'all' || s.category === activeCategory
     const matchSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase())
     return matchCat && matchSearch
@@ -108,10 +65,10 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f0edff]">
-        <div className="text-center">
-          <div className="w-14 h-14 mx-auto mb-4 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#7c3aed] font-bold">লোড হচ্ছে...</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #022c22 0%, #064e3b 50%, #065f46 100%)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: 56, height: 56, margin: '0 auto 16px', border: '4px solid rgba(16,185,129,0.3)', borderTopColor: '#10b981', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <p style={{ color: '#10b981', fontWeight: 700, fontSize: 15 }}>লোড হচ্ছে...</p>
         </div>
       </div>
     )
@@ -125,318 +82,184 @@ export default function DashboardPage() {
     { href: '/dashboard/settings', icon: Settings, label: 'সেটিংস' },
   ]
 
+  const statCards = [
+    { label: 'মোট সেবা', value: services.length + '+', icon: '🏛️', color: 'rgba(16,185,129,0.12)', accent: '#059669' },
+    { label: 'চলমান অর্ডার', value: '০', icon: '⚡', color: 'rgba(245,158,11,0.12)', accent: '#d97706' },
+    { label: 'সফল অর্ডার', value: '০', icon: '✅', color: 'rgba(6,79,59,0.12)', accent: '#064e3b' },
+  ]
+
   return (
-    <div className="min-h-screen flex bg-[#f3f0ff]">
+    <>
+      <style>{`
+        * { box-sizing: border-box; }
+        html, body { width:100%; margin:0; padding:0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .dash-sidebar { background: linear-gradient(170deg, #022c22 0%, #064e3b 45%, #065f46 100%); width:260px; flex-shrink:0; }
+        .dash-root { display:flex; width:100%; min-height:100vh; background:#f6fdf9; overflow:hidden; }
+        .dash-sidebar-wrapper { display:none; position:sticky; top:0; height:100vh; overflow-y:auto; }
+        @media (min-width:1024px) { .dash-sidebar-wrapper { display:flex; flex-direction:column; } }
+        .dash-main { flex:1; min-width:0; display:flex; flex-direction:column; width:100%; overflow-x:hidden; }
+        .dash-main-toggle { display:flex; }
+        @media (min-width:1024px) { .dash-main-toggle { display:none !important; } }
+        .dash-nav-link { display:flex; align-items:center; gap:12px; padding:11px 16px; border-radius:12px; color:rgba(255,255,255,0.7); font-size:14px; font-weight:500; transition:all 0.25s; text-decoration:none; position:relative; }
+        .dash-nav-link:hover { background:rgba(16,185,129,0.15); color:#10b981; }
+        .dash-nav-link.active { background:rgba(16,185,129,0.2); color:#10b981; }
+        .service-card-db { background:#fff; border:1.5px solid rgba(6,79,59,0.09); border-radius:18px; padding:18px 12px 16px; display:flex; flex-direction:column; align-items:center; text-align:center; cursor:pointer; width:100%; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .service-card-db:hover { transform:translateY(-5px); border-color:rgba(5,150,105,0.35); box-shadow:0 12px 35px rgba(6,79,59,0.14); }
+        .service-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; width:100%; }
+        @media (min-width:500px)  { .service-grid { grid-template-columns:repeat(3,1fr); } }
+        @media (min-width:768px)  { .service-grid { grid-template-columns:repeat(4,1fr); } }
+        @media (min-width:1100px) { .service-grid { grid-template-columns:repeat(5,1fr); } }
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px; }
+        .stat-mini { border-radius:16px; padding:16px; border:1px solid rgba(6,79,59,0.08); background:#fff; transition:all 0.25s; }
+        .db-search { width:100%; padding:10px 14px 10px 38px; border-radius:12px; border:1.5px solid rgba(6,79,59,0.14); background:rgba(240,253,244,0.7); font-size:13px; color:#064e3b; outline:none; transition:all 0.2s; }
+        .modal-overlay { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(2,44,34,0.55); backdrop-filter:blur(8px); }
+        .modal-box { background:#fff; border-radius:24px; width:100%; max-width:420px; padding:28px; box-shadow:0 30px 80px rgba(2,44,34,0.25); animation:fadeInUp 0.35s ease; }
+        .balance-card { background:linear-gradient(135deg, #064e3b 0%, #065f46 50%, #059669 100%); border-radius:20px; padding:20px; position:relative; overflow:hidden; }
+      `}</style>
 
-      {/* ── SIDEBAR ── */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-r from-purple-600 to-indigo-700  flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-      >
-        {/* Logo */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
-          <Link href="/" className="text-white font-black text-base leading-tight">
-            নাগরিক সেবা
-          </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-black/40 hover:text-white">
-            <X size={20} />
-          </button>
-        </div>
+      <div className="dash-root">
+        {sidebarOpen && (
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(2,44,34,0.5)', backdropFilter: 'blur(4px)' }}
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-        {/* Balance card */}
-        <div className="px-4 py-4">
-          {isGuest ? (
-            <div className="bg-gradient-to-br from-violet-700 to-violet-500 rounded-2xl p-4 text-white space-y-2 shadow-lg">
-              <p className="text-xs text-white/70 text-center">সেবা নিতে লগিন করুন</p>
-              <Link href="/auth/login" className="w-full bg-white text-violet-800 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5">
-                <LogIn size={13} /> লগিন
-              </Link>
-              <Link href="/auth/register" className="w-full bg-violet-600 border border-white/20 text-white py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5">
-                <UserPlus size={13} /> রেজিস্ট্রেশন
+        <aside className="dash-sidebar dash-sidebar-wrapper" style={{ zIndex: 50 }}>
+          <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: 'linear-gradient(135deg,#10b981,#d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🇧🇩</div>
+                <div>
+                  <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>নাগরিক সেবা</p>
+                  <p style={{ color: 'rgba(16,185,129,0.8)', fontSize: 10, fontWeight: 600, letterSpacing: '0.06em' }}>NAGARIK SHEBA</p>
+                </div>
               </Link>
             </div>
-          ) : (
-            <div className="bg-gradient-to-r from-amber-400 to-orange-500 
-                rounded-2xl p-6 text-center text-white 
-                shadow-lg hover:shadow-xl transition-all duration-300">
-              <p className="text-xs text-violet-100 font-medium mb-1 tracking-wide">
-                বর্তমান ব্যালেন্স
-              </p>
-              <p className="text-3xl font-extrabold mb-4 drop-shadow-sm text-black">
-                {profile?.balance || 0} ৳
+          </div>
+
+          <div style={{ padding: '14px 14px 10px' }}>
+            <div className="balance-card">
+              <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 4 }}>বর্তমান ব্যালেন্স</p>
+              <p style={{ color: '#fff', fontSize: 30, fontWeight: 900, marginBottom: 12 }}>
+                {profile?.balance || 0} <span style={{ fontSize: 16, fontWeight: 600, opacity: 0.8 }}>৳</span>
               </p>
               <Link
                 href="/dashboard/balance"
-                className="block text-center w-full bg-white text-orange-600 
-               py-2 rounded-xl text-sm font-bold 
-               hover:bg-orange-50 hover:text-orange-700 
-               transition-colors shadow-sm"
+                style={{ display: 'block', textAlign: 'center', background: 'linear-gradient(135deg,#d97706,#f59e0b)', color: '#022c22', padding: '9px', borderRadius: 10, fontSize: 12, fontWeight: 800, textDecoration: 'none', boxShadow: '0 4px 14px rgba(217,119,6,0.4)' }}
               >
-                রিচার্জ করুন
+                💳 রিচার্জ করুন
               </Link>
             </div>
-
-
-          )}
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-2 space-y-0.5">
-          {navItems.map(item => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:text-cyan-300 hover:bg-indigo-700/40 transition-all text-sm font-medium group"
-            >
-              <item.icon size={17} className="group-hover:text-violet-300 transition-colors" />
-              {item.label}
-            </Link>
-          ))}
-          {profile?.role === 'admin' && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-amber-400 hover:bg-amber-500/10 transition-all text-sm font-bold border border-amber-500/20 mt-2"
-            >
-              <ShieldCheck size={17} /> এডমিন প্যানেল
-            </Link>
-          )}
-        </nav>
-
-        {/* Logout */}
-        <div className="px-3 py-4 border-t border-white/10">
-          {isGuest ? (
-            <Link href="/auth/login" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-violet-300 hover:bg-violet-700/30 transition text-sm">
-              <LogIn size={17} /> লগিন / রেজিস্ট্রেশন
-            </Link>
-          ) : (
-            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 
-               hover:text-white 
-               hover:bg-rose-600/30    transition-colors duration-300 font-semibold">
-              <LogOut size={17} /> লগআউট
-            </button>
-          )}
-        </div>
-      </aside>
-
-      {/* ── MAIN ── */}
-      <div className="flex-1 flex flex-col min-w-0">
-
-        {/* Top header */}
-        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 h-[60px] flex items-center px-4 gap-3">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition">
-            <Menu size={20} />
-          </button>
-          <div className="flex-1 relative max-w-sm hidden sm:block">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="সেবা খুঁজুন..."
-              className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-300"
-            />
           </div>
-          <div className="ml-auto flex items-center gap-3">
-            <button className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-violet-50 hover:text-violet-600 transition">
-              <Bell size={17} />
+
+          <nav style={{ flex: 1, padding: '6px 10px', overflowY: 'auto' }}>
+            {navItems.map(item => (
+              <Link key={item.label} href={item.href} className="dash-nav-link" style={{ marginBottom: 2 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <item.icon size={15} />
+                </div>
+                {item.label}
+              </Link>
+            ))}
+            {profile?.role === 'admin' && (
+              <Link href="/admin" className="dash-nav-link" style={{ border: '1px solid rgba(217,119,6,0.3)', background: 'rgba(217,119,6,0.08)', color: '#fbbf24' }}>
+                <ShieldCheck size={15} /> এডমিন প্যানেল
+              </Link>
+            )}
+          </nav>
+
+          <div style={{ padding: '12px 10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+            <button onClick={handleLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', borderRadius: 12, background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.18)', color: '#fca5a5', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+              <LogOut size={15} /> লগআউট
             </button>
-            <div className="hidden sm:block text-right">
-              <p className="text-xs font-bold text-gray-800 leading-none">{profile?.full_name}</p>
-              <p className="text-[10px] text-violet-600 font-medium mt-0.5">ব্যালেন্স: {profile?.balance || 0}৳</p>
-            </div>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white font-black text-sm shadow-md">
-              {profile?.full_name?.charAt(0)?.toUpperCase()}
-            </div>
           </div>
-        </header>
+        </aside>
 
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
+        <div className="dash-main">
+          <header style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(6,79,59,0.1)', position: 'sticky', top: 0, zIndex: 30, height: 62, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 12 }}>
+            <button onClick={() => setSidebarOpen(true)} className="dash-main-toggle" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: '#064e3b' }}>
+              <Menu size={22} />
+            </button>
 
-          {/* ── WELCOME BANNER ── */}
-          <div className="relative bg-gradient-to-r from-[#3b0d8c] via-[#7c3aed] to-[#a855f7] rounded-3xl p-6 sm:p-8 mb-6 text-white overflow-hidden shadow-[0_10px_40px_rgba(124,58,237,0.35)]">
-            {/* decorative circles */}
-            <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-            <div className="absolute bottom-0 right-20 w-24 h-24 bg-fuchsia-400/20 rounded-full blur-xl" />
-
-            {/* Credit card decorative on right */}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-2 opacity-30">
-              <div className="w-24 h-14 rounded-xl bg-white/20 backdrop-blur border border-white/30 shadow-inner" />
-              <div className="w-20 h-10 rounded-lg bg-white/15 backdrop-blur border border-white/20 shadow-inner self-end" />
+            <div style={{ flex: 1, maxWidth: 380, position: 'relative' }}>
+              <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }} />
+              <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="সেবা খুঁজুন..." className="db-search" />
             </div>
 
-            <div className="relative z-10 max-w-md">
-              {isGuest ? (
-                <>
-                  <h2 className="text-2xl sm:text-3xl font-black mb-1 leading-tight">
-                    নাগরিক সেবায় স্বাগতম! 👋
-                  </h2>
-                  <p className="text-violet-100 text-sm mb-5 font-medium">
-                    সেবা নিতে লগিন বা ফ্রি রেজিস্ট্রেশন করুন
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <Link href="/auth/register" className="inline-flex items-center gap-2 bg-white text-[#3b0d8c] px-6 py-2.5 rounded-2xl font-black text-sm shadow-lg hover:-translate-y-0.5 transition-all">
-                      <UserPlus size={15} /> বিনামূল্যে যোগ দিন
-                    </Link>
-                    <Link href="/auth/login" className="inline-flex items-center gap-2 bg-white/15 border border-white/30 text-white px-6 py-2.5 rounded-2xl font-bold text-sm hover:bg-white/25 transition-all">
-                      <LogIn size={15} /> লগিন
-                    </Link>
+            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#022c22', lineHeight: 1.2 }}>{profile?.fullName}</p>
+                <p style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>ব্যালেন্স: {profile?.balance || 0}৳</p>
+              </div>
+              <div style={{ width: 38, height: 38, borderRadius: 12, background: 'linear-gradient(135deg,#064e3b,#10b981)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900 }}>
+                {profile?.fullName?.charAt(0)?.toUpperCase()}
+              </div>
+            </div>
+          </header>
+
+          <main style={{ flex: 1, padding: '24px 24px 40px', overflowY: 'auto', width: '100%' }}>
+            <div style={{ background: 'linear-gradient(135deg, #022c22 0%, #064e3b 40%, #065f46 70%, #047857 100%)', borderRadius: 24, padding: '28px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <h2 style={{ fontSize: 26, fontWeight: 900, color: '#fff', marginBottom: 6 }}>আস্সালামু আলাইকুম, {profile?.fullName?.split(' ')[0]}! 👋</h2>
+                <p style={{ color: 'rgba(16,185,129,0.8)', fontSize: 14, marginBottom: 20 }}>আজকে আপনি কোন সরকারি সেবাটি নিতে চান?</p>
+                <Link href="/dashboard/balance" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg,#d97706,#f59e0b)', color: '#022c22', padding: '11px 22px', borderRadius: 14, fontSize: 13, fontWeight: 800, textDecoration: 'none' }}>
+                  <Wallet size={15} /> ব্যালেন্স যোগ করুন
+                </Link>
+              </div>
+            </div>
+
+            <div className="stats-grid">
+              {statCards.map((s, i) => (
+                <div key={i} className="stat-mini">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 13, background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{s.icon}</div>
+                    <div>
+                      <p style={{ fontSize: 20, fontWeight: 900, color: '#022c22' }}>{s.value}</p>
+                      <p style={{ fontSize: 11, color: '#6b7280' }}>{s.label}</p>
+                    </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-2xl sm:text-3xl font-black mb-1 leading-tight">
-                    আস্সালামু আলাইকুম, {profile?.full_name?.split(' ')[0]}! 👋
-                  </h2>
-                  <p className="text-violet-100 text-sm mb-5 font-medium">
-                    আজকে আপনি কোন সরকারি সেবাটি নিতে চান?
-                  </p>
-                  <Link
-                    href="/dashboard/balance"
-                    className="inline-flex items-center gap-2 bg-white text-[#3b0d8c] px-6 py-2.5 rounded-2xl font-black text-sm shadow-lg hover:-translate-y-0.5 transition-all"
-                  >
-                    <Wallet size={15} /> ব্যালেন্স যোগ করুন
-                  </Link>
-                </>
-              )}
+                </div>
+              ))}
             </div>
-          </div>
 
-          {/* ── CATEGORIES ── */}
-          <div className="flex gap-2.5 overflow-x-auto pb-3 no-scrollbar mb-5">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 border ${activeCategory === cat.id
-                  ? 'bg-[#7c3aed] text-white border-[#7c3aed] shadow-[0_4px_12px_rgba(124,58,237,0.35)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-violet-300 hover:text-violet-600'
-                  }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* ── SERVICE GRID (2-col on mobile, more on desktop, matching the app screenshot) ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {filteredServices.map(service => (
-              <button
-                key={service.id}
-                onClick={() => setActiveService(service.id)}
-                className="bg-gradient-to-r from-violet-50 to-pink-100 
-                rounded-3xl p-5 flex flex-col items-center text-center 
-                border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.05)] 
-                hover:shadow-[0_8px_30px_rgba(124,58,237,0.15)] 
-                hover:border-violet-200 hover:-translate-y-1 transition-all duration-300 group"
-              >
-                <div className={`w-16 h-16 ${service.color} rounded-2xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm`}>
-                  {service.icon}
-                </div>
-                <p className="text-sm font-bold text-gray-800 leading-snug mb-3 line-clamp-2">{service.title}</p>
-                <div className="inline-flex items-center bg-violet-50 text-[#7c3aed] px-3 py-1.5 rounded-full text-[11px] font-black border border-violet-100">
-                  ৳ {service.price}
-                </div>
-              </button>
-            ))}
-          </div>
-        </main>
+            <div className="service-grid">
+              {filteredServices.map((service: any) => (
+                <button key={service.id} onClick={() => setActiveService(service.id)} className="service-card-db">
+                  <div className={service.color} style={{ width: 60, height: 60, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, marginBottom: 12 }}>{service.icon}</div>
+                  <p style={{ fontSize: 12.5, fontWeight: 700, color: '#1f2937', marginBottom: 10 }}>{service.title}</p>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ecfdf5', color: '#065f46', borderRadius: 99, padding: '4px 12px', fontSize: 11, fontWeight: 800 }}>৳ {service.price}</div>
+                </button>
+              ))}
+            </div>
+          </main>
+        </div>
       </div>
 
-      {/* ── RECHARGE MODAL ── */}
-      {paymentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
-            <h3 className="text-xl font-black mb-5 flex items-center gap-2 text-gray-800">
-              <Wallet className="text-violet-600" size={22} /> রিচার্জ করুন
-            </h3>
-            <div className="bg-violet-50 p-4 rounded-2xl mb-5 border border-violet-100">
-              <p className="text-[10px] text-violet-500 font-bold uppercase tracking-wider mb-1">বিকাশ/নগদ (পার্সোনাল)</p>
-              <p className="text-lg font-black text-violet-700 tracking-widest">017XXXXXXXX</p>
-              <p className="text-[10px] text-violet-500 mt-1">সেন্ড মানি করার পর ট্রানজেকশন আইডি দিন</p>
-            </div>
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                {['bKash', 'Nagad'].map(m => (
-                  <button
-                    key={m}
-                    onClick={() => setMethod(m)}
-                    className={`flex-1 py-2.5 rounded-xl border-2 text-sm font-bold transition-all ${method === m ? 'border-violet-600 bg-violet-50 text-violet-700' : 'border-gray-100 text-gray-400'}`}
-                  >
-                    {m}
-                  </button>
-                ))}
-              </div>
-              <input type="number" placeholder="টাকার পরিমাণ" className="w-full p-3.5 bg-gray-50 rounded-2xl outline-none border border-gray-100 focus:ring-2 focus:ring-violet-400 text-sm" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} />
-              <input type="text" placeholder="Transaction ID (TrxID)" className="w-full p-3.5 bg-gray-50 rounded-2xl outline-none border border-gray-100 focus:ring-2 focus:ring-violet-400 text-sm" value={trxId} onChange={e => setTrxId(e.target.value)} />
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setPaymentModalOpen(false)} className="flex-1 py-3.5 bg-gray-100 rounded-2xl font-bold text-gray-500 text-sm hover:bg-gray-200 transition">বাতিল</button>
-                <button onClick={handleAddBalance} disabled={submitting} className="flex-1 py-3.5 bg-[#7c3aed] text-white rounded-2xl font-bold shadow-lg shadow-violet-200 text-sm hover:bg-violet-700 transition">
-                  {submitting ? 'প্রসেসিং...' : 'সাবমিট করুন'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── ORDER MODAL ── */}
       {activeService && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setActiveService(null)}>
-          <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setActiveService(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
             {(() => {
-              const s = services.find(sv => sv.id === activeService)
+              const s = services.find((sv: any) => sv.id === activeService)
               if (!s) return null
-
-              if (isGuest) return (
-                <>
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-3xl shadow-md`}>{s.icon}</div>
-                    <div>
-                      <h3 className="text-lg font-black text-gray-800">{s.title}</h3>
-                      <p className="text-violet-600 font-bold text-sm">চার্জ: {s.price} ৳</p>
-                    </div>
-                  </div>
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 text-center">
-                    <p className="text-amber-700 font-black mb-1">🔒 লগিন প্রয়োজন</p>
-                    <p className="text-amber-600 text-sm">এই সেবা নিতে লগিন করুন বা ফ্রি আকাউন্ট বানান</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => setActiveService(null)} className="flex-1 py-4 bg-gray-100 rounded-2xl font-bold text-gray-500 text-sm hover:bg-gray-200 transition">বাতিল</button>
-                    <Link href="/auth/login" className="flex-1 py-4 bg-[#7c3aed] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg text-sm hover:bg-violet-700 transition">
-                      <LogIn size={17} /> লগিন
-                    </Link>
-                  </div>
-                </>
-              )
-
               return (
                 <>
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-3xl shadow-md`}>{s.icon}</div>
-                    <div>
-                      <h3 className="text-lg font-black text-gray-800">{s.title}</h3>
-                      <p className="text-violet-600 font-bold text-sm">চার্জ: {s.price} ৳</p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div className={s.color} style={{ width: 52, height: 52, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>{s.icon}</div>
+                      <div>
+                        <h3 style={{ fontSize: 16, fontWeight: 800, color: '#022c22' }}>{s.title}</h3>
+                        <p style={{ fontSize: 12, fontWeight: 800, color: '#059669' }}>চার্জ: {s.price} ৳</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="mb-5">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">{s.inputLabel || 'প্রয়োজনীয় তথ্য'}</label>
-                    <input
-                      type="text"
-                      value={orderInput}
-                      onChange={e => setOrderInput(e.target.value)}
-                      placeholder={s.inputPlaceholder || 'এখানে লিখুন...'}
-                      className="w-full p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 focus:ring-2 focus:ring-violet-400 text-sm"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => setActiveService(null)} className="flex-1 py-4 bg-gray-100 rounded-2xl font-bold text-gray-500 text-sm hover:bg-gray-200 transition">বাতিল</button>
-                    <button onClick={() => handlePlaceOrder(s)} disabled={submitting} className="flex-1 py-4 bg-[#7c3aed] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-violet-200 text-sm hover:bg-violet-700 transition">
-                      {submitting ? 'লোড হচ্ছে...' : <><Send size={16} /> অর্ডার করুন</>}
+                  <input type="text" value={orderInput} onChange={e => setOrderInput(e.target.value)} placeholder={s.inputPlaceholder || 'এখানে লিখুন...'} style={{ width: '100%', padding: '13px', borderRadius: 13, border: '1.5px solid #ddd', marginBottom: 18 }} />
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button onClick={() => setActiveService(null)} style={{ flex: 1, padding: '13px', borderRadius: 13, background: '#f3f4f6' }}>বাতিল</button>
+                    <button onClick={() => handlePlaceOrder(s)} disabled={submitting} style={{ flex: 1, padding: '13px', borderRadius: 13, background: '#059669', color: '#fff', fontWeight: 800 }}>
+                      {submitting ? 'লোড হচ্ছে...' : 'অর্ডার করুন'}
                     </button>
                   </div>
                 </>
@@ -445,6 +268,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

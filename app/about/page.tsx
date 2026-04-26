@@ -1,48 +1,92 @@
+'use client'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import { stats } from '@/lib/services'
-import Link from 'next/link'
-import { CheckCircle, ArrowRight } from 'lucide-react'
+import { Shield, Users, Globe, Award, CheckCircle2 } from 'lucide-react'
+import Image from 'next/image'
+
+const values = [
+  { icon: Shield, title: 'নিরাপত্তা', desc: 'আপনার সকল তথ্য আমাদের কাছে সম্পূর্ণ নিরাপদ ও এনক্রিপ্টেড থাকে।' },
+  { icon: Users, title: 'গ্রাহক সেবা', desc: 'আমাদের দক্ষ টিম ২৪/৭ আপনাকে সেবা দিতে প্রস্তুত।' },
+  { icon: Globe, title: 'সহজলভ্যতা', desc: 'গ্রাম বা শহর, দেশের যেকোনো প্রান্ত থেকে আমাদের সেবা গ্রহণ করা যায়।' },
+  { icon: Award, title: 'নির্ভরযোগ্যতা', desc: 'বিগত কয়েক বছর ধরে আমরা লক্ষ লক্ষ গ্রাহককে সফলভাবে সেবা দিয়ে আসছি।' },
+]
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-[#f6fdf9]">
       <Navbar />
-      <div className="hero-gradient py-20 text-center text-white">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4">আমাদের সম্পর্কে</h1>
-        <p className="text-violet-100 text-lg max-w-2xl mx-auto px-4">বাংলাদেশের সরকারি সেবাকে সহজলভ্য ও ডিজিটাল করার লক্ষ্যে আমাদের যাত্রা</p>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+      
+      {/* Hero Section */}
+      <section className="relative py-24 hero-gradient overflow-hidden">
+        <div className="absolute inset-0 grid-dots opacity-20" />
+        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white">
+          <span className="tag-gold mb-6 inline-block">আমাদের সম্পর্কে</span>
+          <h1 className="text-4xl md:text-6xl font-black mb-6 glow-green">সহজ ডিজিটাল সেবা</h1>
+          <p className="text-xl text-emerald-100 max-w-2xl mx-auto leading-relaxed">
+            আমরা বাংলাদেশের নাগরিকদের সরকারি ও ডিজিটাল সেবা প্রাপ্তি সহজতর করতে অঙ্গীকারবদ্ধ। 
+            একটি স্মার্ট বাংলাদেশ বিনির্মাণে আমরা আপনার ডিজিটাল সঙ্গী।
+          </p>
+        </div>
+      </section>
+
+      {/* Mission & Vision */}
+      <section className="py-20 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="relative">
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-emerald-100 rounded-full blur-3xl opacity-50" />
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+              <Image 
+                src="/banner1.png" 
+                alt="Our Mission" 
+                width={600} 
+                height={400}
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
           <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">আমাদের লক্ষ্য</h2>
-            <p className="text-gray-600 leading-relaxed mb-4">ডিজিটাল শেবা বিডি বাংলাদেশের সকল নাগরিককে সরকারি সেবা সহজে পেতে সাহায্য করে। আমরা বিশ্বাস করি প্রযুক্তি ব্যবহার করে সরকারি সেবাকে আরো দ্রুত, সহজ এবং সাশ্রয়ী করা সম্ভব।</p>
-            <div className="space-y-3">
-              {['দ্রুত ও নির্ভরযোগ্য সেবা', 'Supabase দ্বারা সম্পূর্ণ নিরাপদ', '২৪/৭ কাস্টমার সাপোর্ট', 'সাশ্রয়ী মূল্যে সর্বোচ্চ মানের সেবা'].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle size={20} className="text-[#7c3aed] flex-shrink-0" /> {item}
+            <h2 className="text-3xl font-black text-[#022c22] mb-6 section-title">আমাদের লক্ষ্য ও উদ্দেশ্য</h2>
+            <p className="text-gray-600 mb-8 leading-relaxed text-lg">
+              সহজ ডিজিটাল সেবার মূল লক্ষ্য হলো জটিল সরকারি সেবাগুলোকে সাধারণ মানুষের হাতের মুঠোয় পৌঁছে দেওয়া। 
+              আমরা বিশ্বাস করি যে প্রযুক্তি ব্যবহারের মাধ্যমে নাগরিক জীবন আরও সহজ ও সুন্দর করা সম্ভব।
+            </p>
+            <div className="space-y-4">
+              {[
+                'স্বচ্ছ ও দ্রুত সেবা নিশ্চিত করা',
+                'দালালমুক্ত সরকারি সেবা প্রাপ্তি',
+                'ডিজিটাল স্বাক্ষরতা বৃদ্ধি করা',
+                'সর্বাধুনিক প্রযুক্তির ব্যবহার'
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <CheckCircle2 className="text-[#059669]" size={20} />
+                  <span className="font-bold text-[#022c22]">{item}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {stats.map((s, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100">
-                <div className="text-3xl mb-2">{s.icon}</div>
-                <div className="text-2xl font-bold text-[#7c3aed]">{s.value}</div>
-                <div className="text-gray-500 text-sm mt-1">{s.label}</div>
+        </div>
+      </section>
+
+      {/* Core Values */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-black text-[#022c22] section-title">আমাদের মূল স্তম্ভ</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {values.map((v, i) => (
+              <div key={i} className="service-card bg-[#f0fdf4] p-8 rounded-3xl text-center">
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-emerald-100">
+                  <v.icon size={28} className="text-[#059669]" />
+                </div>
+                <h3 className="text-xl font-bold text-[#022c22] mb-4">{v.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{v.desc}</p>
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-gradient-to-r from-[#4c1d95] to-[#7c3aed] rounded-3xl p-10 text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">আজই যোগ দিন</h2>
-          <p className="text-violet-100 mb-6">বিনামূল্যে অ্যাকাউন্ট খুলুন এবং সকল সেবা উপভোগ করুন</p>
-          <Link href="/auth/register" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#7c3aed] font-bold rounded-xl hover:bg-violet-50 transition-all">
-            রেজিস্ট্রেশন করুন <ArrowRight size={18} />
-          </Link>
-        </div>
-      </div>
+      </section>
+
       <Footer />
     </div>
   )

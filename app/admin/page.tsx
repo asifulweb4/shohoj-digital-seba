@@ -1,9 +1,15 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-
-const BKASH_NUMBER = '01XXXXXXXXX'  // ← আপনার আসল বিকাশ নাম্বার দিন
+import { 
+    getAdminStats, 
+    approveTransactionAction, 
+    rejectTransactionAction, 
+    updateOrderAction,
+    logoutAction,
+    getProfile
+} from '@/lib/actions'
+import { LayoutDashboard, Users, CreditCard, ShoppingBag, LogOut, Check, X, Edit2, ShieldCheck, Search } from 'lucide-react'
 
 export default function AdminPage() {
     const router = useRouter()
@@ -16,93 +22,61 @@ export default function AdminPage() {
     const [saving, setSaving] = useState(false)
     const [msg, setMsg] = useState('')
 
-    // ── Auth check ────────────────────────────────────
     useEffect(() => {
-        checkAdmin()
-    }, [])
-
-    async function checkAdmin() {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) { router.push('/auth/login'); return }
-
-        const { data: profile } = await supabase
-            .from('profiles').select('role').eq('id', session.user.id).single()
-
-        if (!profile || profile.role !== 'admin') {
-            router.push('/dashboard')
-            return
+        const checkAdmin = async () => {
+            const profile = await getProfile()
+            if (!profile || profile.role !== 'admin') {
+                router.push('/dashboard')
+                return
+            }
+            setLoading(false)
+            loadAll()
         }
-        setLoading(false)
-        loadAll()
-    }
+        checkAdmin()
+    }, [router])
 
     async function loadAll() {
-        loadTransactions()
-        loadOrders()
-        loadUsers()
-    }
-
-    // ── Load data ─────────────────────────────────────
-    async function loadTransactions() {
-        const { data } = await supabase
-            .from('transactions')
-            .select('*, profiles(full_name, phone)')
-            .order('created_at', { ascending: false })
-        setTransactions(data || [])
-    }
-
-    async function loadOrders() {
-        const { data } = await supabase
-            .from('orders')
-            .select('*, profiles(full_name, phone)')
-            .order('created_at', { ascending: false })
-        setOrders(data || [])
-    }
-
-    async function loadUsers() {
-        const { data } = await supabase
-            .from('profiles')
-            .select('*')
-            .order('created_at', { ascending: false })
-        setUsers(data || [])
-    }
-
-    // ── Approve Transaction (balance যোগ হবে) ─────────
-    async function approveTransaction(txn: any) {
-        setSaving(true)
-        const { data, error } = await supabase.rpc('approve_transaction', {
-            p_transaction_id: txn.id
-        })
-        setSaving(false)
-
-        if (error || !data?.success) {
-            showMsg('❌ ' + (error?.message || data?.message || 'সমস্যা হয়েছে।'))
-        } else {
-            showMsg('✅ Balance যোগ হয়েছে!')
-            loadTransactions()
-            loadUsers()
+        const data = await getAdminStats()
+        if (data) {
+            setTransactions(data.transactions)
+            setOrders(data.orders)
+            setUsers(data.users)
         }
     }
 
-    // ── Reject Transaction ────────────────────────────
-    async function rejectTransaction(id: string) {
-        await supabase.from('transactions').update({ status: 'rejected' }).eq('id', id)
-        showMsg('❌ Transaction বাতিল করা হয়েছে।')
-        loadTransactions()
+    async function approveTransaction(txn: any) {
+        if(!confirm('আপনি কি এই পেমেন্টটি অ্যাপ্রুভ করতে চান?')) return
+        setSaving(true)
+        const res = await approveTransactionAction(txn.id)
+        setSaving(false)
+        if (!res.success) { showMsg('❌ সমস্যা হয়েছে।') } 
+        else { showMsg('✅ Balance যোগ হয়েছে!'); loadAll() }
     }
 
-    // ── Update Order ──────────────────────────────────
+    async function rejectTransaction(id: number) {
+        if(!confirm('আপনি কি এই ট্রানজেকশনটি বাতিল করতে চান?')) return
+        setSaving(true)
+        const res = await rejectTransactionAction(id)
+        setSaving(false)
+        if (res.success) { showMsg('❌ Transaction বাতিল করা হয়েছে।'); loadAll() }
+    }
+
     async function updateOrder(e: React.FormEvent) {
         e.preventDefault()
         if (!editOrder) return
         setSaving(true)
-        await supabase.from('orders')
-            .update({ status: editOrder.status, notes: editOrder.notes })
-            .eq('id', editOrder.id)
+        const res = await updateOrderAction(editOrder.id, editOrder.status, editOrder.notes || '')
         setSaving(false)
-        setEditOrder(null)
-        showMsg('✅ Order আপডেট হয়েছে!')
-        loadOrders()
+        if (res.success) {
+            setEditOrder(null)
+            showMsg('✅ Order আপডেট হয়েছে!')
+            loadAll()
+        }
+    }
+
+    async function handleLogout() {
+        await logoutAction()
+        router.push('/auth/login')
     }
 
     function showMsg(text: string) {
@@ -110,273 +84,217 @@ export default function AdminPage() {
         setTimeout(() => setMsg(''), 3000)
     }
 
-    // ── Stats ─────────────────────────────────────────
     const stats = {
-        pendingTxn: transactions.filter(t => t.status === 'pending').length,
+        pendingTxn: transactions.filter((t: any) => t.status === 'pending').length,
         totalTxn: transactions.length,
-        pendingOrders: orders.filter(o => o.status === 'pending').length,
+        pendingOrders: orders.filter((o: any) => o.status === 'pending').length,
         totalUsers: users.length,
-        totalBalance: users.reduce((s, u) => s + (u.balance || 0), 0),
-    }
-
-    const statusColor: Record<string, string> = {
-        pending: '#f59e0b', approved: '#10b981', rejected: '#ef4444',
-        completed: '#10b981', cancelled: '#ef4444', processing: '#8b5cf6'
-    }
-    const statusBn: Record<string, string> = {
-        pending: 'অপেক্ষায়', approved: 'অনুমোদিত', rejected: 'বাতিল',
-        completed: 'সম্পন্ন', cancelled: 'বাতিল', processing: 'প্রক্রিয়ায়'
     }
 
     if (loading) return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-            <div style={{ textAlign: 'center' }}>
-                <div style={{ width: 48, height: 48, border: '4px solid #7c3aed', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-                <p style={{ color: '#7c3aed', fontFamily: 'Hind Siliguri, sans-serif' }}>লোড হচ্ছে...</p>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-[#f6fdf9]">
+            <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
         </div>
     )
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'Hind Siliguri, sans-serif' }}>
-
-            {/* Toast */}
+        <div className="min-h-screen bg-[#f6fdf9]">
             {msg && (
-                <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 999, background: '#2e1065', color: '#fff', padding: '14px 20px', borderRadius: 12, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
+                <div className="fixed bottom-6 right-6 z-[1000] bg-emerald-900 text-white px-6 py-4 rounded-2xl shadow-2xl animate-bounce">
                     {msg}
                 </div>
             )}
 
-            {/* Top Bar */}
-            <div style={{ background: '#2e1065', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 22 }}>🌿</span>
-                    <span style={{ color: '#fff', fontWeight: 700, fontSize: '1.1rem' }}>Admin Panel — Digital Sheba</span>
-                </div>
-                <div style={{ display: 'flex', gap: 10 }}>
-                    <a href="/dashboard" style={{ color: '#86efac', fontSize: 13, textDecoration: 'none' }}>🌐 Dashboard</a>
-                    <button onClick={() => supabase.auth.signOut().then(() => router.push('/auth/login'))}
-                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fca5a5', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'Hind Siliguri, sans-serif' }}>
-                        লগআউট
-                    </button>
-                </div>
-            </div>
-
-            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 16px' }}>
-
-                {/* Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14, marginBottom: 24 }}>
-                    {[
-                        { label: 'অপেক্ষায় Deposit', value: stats.pendingTxn, color: '#f59e0b', bg: '#fffbeb' },
-                        { label: 'মোট Transaction', value: stats.totalTxn, color: '#8b5cf6', bg: '#eff6ff' },
-                        { label: 'Pending Order', value: stats.pendingOrders, color: '#8b5cf6', bg: '#f5f3ff' },
-                        { label: 'মোট User', value: stats.totalUsers, color: '#7c3aed', bg: '#f8fafc' },
-                    ].map(({ label, value, color, bg }) => (
-                        <div key={label} style={{ background: bg, border: `1px solid ${color}30`, borderRadius: 14, padding: '18px 16px' }}>
-                            <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 6 }}>{label}</div>
-                            <div style={{ fontSize: 26, fontWeight: 700, color }}>{value}</div>
+            <div className="flex flex-col md:flex-row min-h-screen">
+                <aside className="w-full md:w-64 bg-[#022c22] text-white p-6 flex flex-col">
+                    <div className="flex items-center gap-3 mb-10">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-emerald-500/20">🇧🇩</div>
+                        <div>
+                            <p className="font-black text-sm leading-none">অ্যাডমিন প্যানেল</p>
+                            <p className="text-[10px] font-bold text-emerald-400 mt-1 uppercase tracking-widest">Admin Control</p>
                         </div>
-                    ))}
-                </div>
+                    </div>
 
-                {/* Tabs */}
-                <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-                    {([
-                        { key: 'transactions', label: '💳 Deposit Requests' },
-                        { key: 'orders', label: '📋 Orders' },
-                        { key: 'users', label: '👥 Users' },
-                    ] as const).map(({ key, label }) => (
-                        <button key={key} onClick={() => setTab(key)}
-                            style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${tab === key ? '#7c3aed' : '#e5e7eb'}`, background: tab === key ? '#7c3aed' : '#fff', color: tab === key ? '#fff' : '#6b7280', cursor: 'pointer', fontFamily: 'Hind Siliguri, sans-serif', fontSize: 14, fontWeight: 600 }}>
-                            {label}
-                            {key === 'transactions' && stats.pendingTxn > 0 && (
-                                <span style={{ background: '#ef4444', color: '#fff', borderRadius: 10, padding: '1px 7px', fontSize: 11, marginLeft: 6 }}>{stats.pendingTxn}</span>
-                            )}
+                    <nav className="space-y-2 flex-1">
+                        <AdminNavLink active={tab === 'transactions'} onClick={() => setTab('transactions')} icon={CreditCard} label="পেমেন্ট রিকোয়েস্ট" count={stats.pendingTxn} />
+                        <AdminNavLink active={tab === 'orders'} onClick={() => setTab('orders')} icon={ShoppingBag} label="অর্ডার সমূহ" count={stats.pendingOrders} />
+                        <AdminNavLink active={tab === 'users'} onClick={() => setTab('users')} icon={Users} label="ইউজার লিস্ট" />
+                    </nav>
+
+                    <div className="mt-auto pt-6 border-t border-white/10 space-y-2">
+                        <button onClick={() => router.push('/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-sm font-bold text-emerald-400">
+                            <LayoutDashboard size={18} /> ড্যাশবোর্ড
                         </button>
-                    ))}
-                </div>
+                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-500/10 transition-all text-sm font-bold text-rose-400">
+                            <LogOut size={18} /> লগআউট
+                        </button>
+                    </div>
+                </aside>
 
-                {/* ── TRANSACTIONS TAB ── */}
-                {tab === 'transactions' && (
-                    <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ background: '#f9fafb' }}>
-                                        {['ব্যবহারকারী', 'ফোন', 'পরিমাণ', 'Method', 'TrxID', 'স্ট্যাটাস', 'তারিখ', 'একশন'].map(h => (
-                                            <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontSize: 11, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #f3f4f6' }}>{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {transactions.length === 0 ? (
-                                        <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#9ca3af' }}>কোনো transaction নেই।</td></tr>
-                                    ) : transactions.map(t => (
-                                        <tr key={t.id} style={{ borderBottom: '1px solid #f9fafb' }}>
-                                            <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600 }}>{t.profiles?.full_name || '—'}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 13, color: '#7c3aed' }}>{t.profiles?.phone || '—'}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 700, color: '#7c3aed' }}>৳{t.amount}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 13 }}>{t.method}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 12, color: '#6b7280', fontFamily: 'monospace' }}>{t.trx_id}</td>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                <span style={{ background: `${statusColor[t.status] || '#6b7280'}20`, color: statusColor[t.status] || '#6b7280', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                                                    {statusBn[t.status] || t.status}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '12px 14px', fontSize: 11, color: '#9ca3af' }}>
-                                                {new Date(t.created_at).toLocaleDateString('bn-BD')}
-                                            </td>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                {t.status === 'pending' && (
-                                                    <div style={{ display: 'flex', gap: 6 }}>
-                                                        <button onClick={() => approveTransaction(t)} disabled={saving}
-                                                            style={{ background: '#dcfce7', color: '#15803d', border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'Hind Siliguri, sans-serif' }}>
-                                                            ✅ Approve
-                                                        </button>
-                                                        <button onClick={() => rejectTransaction(t.id)}
-                                                            style={{ background: '#fee2e2', color: '#dc2626', border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'Hind Siliguri, sans-serif' }}>
-                                                            ❌ Reject
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </td>
+                <main className="flex-1 p-4 sm:p-8 overflow-x-hidden">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <StatCard label="পেন্ডিং পেমেন্ট" value={stats.pendingTxn} color="amber" />
+                        <StatCard label="পেন্ডিং অর্ডার" value={stats.pendingOrders} color="emerald" />
+                        <StatCard label="মোট ট্রানজেকশন" value={stats.totalTxn} color="blue" />
+                        <StatCard label="মোট ইউজার" value={stats.totalUsers} color="gray" />
+                    </div>
+
+                    <div className="bg-white rounded-[2.5rem] shadow-xl shadow-emerald-900/5 border border-emerald-50 overflow-hidden">
+                        <div className="p-6 border-b border-emerald-50 bg-emerald-50/30 flex items-center justify-between">
+                            <h2 className="text-xl font-black text-[#022c22]">
+                                {tab === 'transactions' ? '💳 পেমেন্ট রিকোয়েস্ট' : tab === 'orders' ? '📋 অর্ডার সমূহ' : '👥 ইউজার লিস্ট'}
+                            </h2>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            {tab === 'transactions' && (
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        <tr>
+                                            <th className="px-6 py-4">ইউজার</th>
+                                            <th className="px-6 py-4">পরিমাণ</th>
+                                            <th className="px-6 py-4">মেথড / TrxID</th>
+                                            <th className="px-6 py-4">স্ট্যাটাস</th>
+                                            <th className="px-6 py-4">একশন</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {transactions.map((t: any) => (
+                                            <tr key={t.id} className="hover:bg-emerald-50/30 transition-all">
+                                                <td className="px-6 py-4 font-bold text-sm text-gray-700">{t.userId}</td>
+                                                <td className="px-6 py-4 font-black text-emerald-700">৳{t.amount}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-xs font-bold text-gray-800">{t.method}</div>
+                                                    <div className="text-[10px] font-mono text-gray-400">{t.trxId}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${t.status === 'pending' ? 'bg-amber-100 text-amber-700' : t.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                        {t.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {t.status === 'pending' && (
+                                                        <div className="flex gap-2">
+                                                            <button onClick={() => approveTransaction(t)} className="p-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200"><Check size={16} /></button>
+                                                            <button onClick={() => rejectTransaction(t.id)} className="p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-all shadow-lg shadow-rose-200"><X size={16} /></button>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+
+                            {tab === 'orders' && (
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        <tr>
+                                            <th className="px-6 py-4">সার্ভিস</th>
+                                            <th className="px-6 py-4">ইনপুট ডেটা</th>
+                                            <th className="px-6 py-4">মূল্য</th>
+                                            <th className="px-6 py-4">স্ট্যাটাস</th>
+                                            <th className="px-6 py-4">একশন</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {orders.map((o: any) => (
+                                            <tr key={o.id} className="hover:bg-emerald-50/30 transition-all">
+                                                <td className="px-6 py-4 font-bold text-sm text-gray-800">{o.serviceName}</td>
+                                                <td className="px-6 py-4 text-xs text-gray-500 max-w-xs truncate">{o.inputData}</td>
+                                                <td className="px-6 py-4 font-black text-emerald-700">৳{o.price}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${o.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : o.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                        {o.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <button onClick={() => setEditOrder({ ...o })} className="p-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200"><Edit2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+
+                            {tab === 'users' && (
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        <tr>
+                                            <th className="px-6 py-4">নাম</th>
+                                            <th className="px-6 py-4">ফোন</th>
+                                            <th className="px-6 py-4">ব্যালেন্স</th>
+                                            <th className="px-6 py-4">রোল</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {users.map((u: any) => (
+                                            <tr key={u.id} className="hover:bg-emerald-50/30 transition-all">
+                                                <td className="px-6 py-4 font-bold text-sm text-gray-800">{u.fullName}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{u.phone}</td>
+                                                <td className="px-6 py-4 font-black text-emerald-700">৳{u.balance}</td>
+                                                <td className="px-6 py-4 text-xs font-bold uppercase">{u.role}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
-                )}
-
-                {/* ── ORDERS TAB ── */}
-                {tab === 'orders' && (
-                    <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ background: '#f9fafb' }}>
-                                        {['অর্ডার', 'ব্যবহারকারী', 'সার্ভিস', 'তথ্য', 'মূল্য', 'স্ট্যাটাস', 'একশন'].map(h => (
-                                            <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontSize: 11, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #f3f4f6' }}>{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orders.length === 0 ? (
-                                        <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#9ca3af' }}>কোনো অর্ডার নেই।</td></tr>
-                                    ) : orders.map(o => (
-                                        <tr key={o.id} style={{ borderBottom: '1px solid #f9fafb' }}>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                <div style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>{o.order_number || '—'}</div>
-                                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{new Date(o.created_at).toLocaleDateString('bn-BD')}</div>
-                                            </td>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                <div style={{ fontSize: 13, fontWeight: 600 }}>{o.profiles?.full_name || '—'}</div>
-                                                <div style={{ fontSize: 11, color: '#7c3aed' }}>{o.profiles?.phone || '—'}</div>
-                                            </td>
-                                            <td style={{ padding: '12px 14px', fontSize: 13 }}>{o.service_name || '—'}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 12, color: '#6b7280', maxWidth: 150 }}>
-                                                {typeof o.input_data === 'string'
-                                                    ? o.input_data.substring(0, 40) + (o.input_data.length > 40 ? '...' : '')
-                                                    : JSON.stringify(o.input_data)?.substring(0, 40) + '...'}
-                                            </td>
-                                            <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#7c3aed' }}>৳{o.price}</td>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                <span style={{ background: `${statusColor[o.status] || '#6b7280'}20`, color: statusColor[o.status] || '#6b7280', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                                                    {statusBn[o.status] || o.status}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                <button onClick={() => setEditOrder({ ...o })}
-                                                    style={{ background: '#dcfce7', color: '#15803d', border: 'none', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'Hind Siliguri, sans-serif' }}>
-                                                    সম্পাদনা
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {/* ── USERS TAB ── */}
-                {tab === 'users' && (
-                    <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ background: '#f9fafb' }}>
-                                        {['নাম', 'ফোন', 'ব্যালেন্স', 'ভূমিকা', 'যোগদান'].map(h => (
-                                            <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontSize: 11, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #f3f4f6' }}>{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {users.map(u => (
-                                        <tr key={u.id} style={{ borderBottom: '1px solid #f9fafb' }}>
-                                            <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600 }}>{u.full_name}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 13, color: '#7c3aed' }}>{u.phone}</td>
-                                            <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 700, color: u.balance > 0 ? '#7c3aed' : '#9ca3af' }}>৳{u.balance || 0}</td>
-                                            <td style={{ padding: '12px 14px' }}>
-                                                <span style={{ background: u.role === 'admin' ? '#fef3c7' : '#f8fafc', color: u.role === 'admin' ? '#92400e' : '#15803d', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                                                    {u.role === 'admin' ? 'Admin' : 'Client'}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '12px 14px', fontSize: 12, color: '#9ca3af' }}>
-                                                {new Date(u.created_at).toLocaleDateString('bn-BD')}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
+                </main>
             </div>
 
-            {/* ── Edit Order Modal ── */}
             {editOrder && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-                    onClick={e => e.target === e.currentTarget && setEditOrder(null)}>
-                    <div style={{ background: '#fff', borderRadius: 20, padding: 28, width: '100%', maxWidth: 440 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2e1065' }}>Order আপডেট করুন</h3>
-                            <button onClick={() => setEditOrder(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9ca3af' }}>✕</button>
-                        </div>
-
-                        <div style={{ background: '#f8fafc', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
-                            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>সার্ভিস</div>
-                            <div style={{ fontWeight: 600, color: '#2e1065' }}>{editOrder.service_name}</div>
-                            <div style={{ fontSize: 12, color: '#6b7280', marginTop: 8 }}>তথ্য: {editOrder.input_data}</div>
-                        </div>
-
-                        <form onSubmit={updateOrder}>
-                            <div style={{ marginBottom: 14 }}>
-                                <label style={{ display: 'block', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>স্ট্যাটাস</label>
-                                <select value={editOrder.status} onChange={e => setEditOrder({ ...editOrder, status: e.target.value })}
-                                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontFamily: 'Hind Siliguri, sans-serif', fontSize: 14, outline: 'none' }}>
-                                    <option value="pending">অপেক্ষায়</option>
-                                    <option value="processing">প্রক্রিয়ায়</option>
-                                    <option value="completed">সম্পন্ন</option>
-                                    <option value="cancelled">বাতিল</option>
+                <div className="fixed inset-0 bg-[#022c22]/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl">
+                        <h3 className="text-xl font-black text-[#022c22] mb-6">অর্ডার আপডেট করুন</h3>
+                        <form onSubmit={updateOrder} className="space-y-6">
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">বর্তমান স্ট্যাটাস</label>
+                                <select value={editOrder.status} onChange={e => setEditOrder({ ...editOrder, status: e.target.value })} className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-emerald-50 outline-none focus:border-emerald-500 font-bold text-sm transition-all">
+                                    <option value="pending">Pending</option>
+                                    <option value="processing">Processing</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
-
-                            <div style={{ marginBottom: 20 }}>
-                                <label style={{ display: 'block', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>নোট</label>
-                                <textarea rows={3} value={editOrder.notes || ''} onChange={e => setEditOrder({ ...editOrder, notes: e.target.value })}
-                                    placeholder="ডেলিভারি তথ্য..."
-                                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontFamily: 'Hind Siliguri, sans-serif', fontSize: 14, outline: 'none', resize: 'vertical' }} />
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">নোট / ডেলিভারি তথ্য</label>
+                                <textarea rows={4} value={editOrder.notes || ''} onChange={e => setEditOrder({ ...editOrder, notes: e.target.value })} className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-emerald-50 outline-none focus:border-emerald-500 font-bold text-sm transition-all resize-none" placeholder="লিংক বা তথ্য দিন..." />
                             </div>
-
-                            <button type="submit" disabled={saving}
-                                style={{ width: '100%', padding: 13, borderRadius: 12, border: 'none', background: '#7c3aed', color: '#fff', fontWeight: 700, fontSize: 15, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Hind Siliguri, sans-serif', opacity: saving ? 0.7 : 1 }}>
-                                {saving ? 'সংরক্ষণ হচ্ছে...' : '✅ আপডেট করুন'}
-                            </button>
+                            <div className="flex gap-4">
+                                <button type="button" onClick={() => setEditOrder(null)} className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-sm">বাতিল</button>
+                                <button type="submit" disabled={saving} className="flex-1 py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-200">আপডেট করুন</button>
+                            </div>
                         </form>
                     </div>
                 </div>
             )}
+        </div>
+    )
+}
+
+function AdminNavLink({ active, icon: Icon, label, onClick, count }: any) {
+    return (
+        <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-bold ${active ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' : 'text-emerald-100/60 hover:bg-white/5 hover:text-white'}`}>
+            <Icon size={18} />
+            {label}
+            {count > 0 && <span className="ml-auto bg-amber-500 text-[#022c22] text-[10px] font-black px-2 py-0.5 rounded-full">{count}</span>}
+        </button>
+    )
+}
+
+function StatCard({ label, value, color }: any) {
+    const colors: any = {
+        emerald: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+        amber: 'bg-amber-50 text-amber-700 border-amber-100',
+        blue: 'bg-blue-50 text-blue-700 border-blue-100',
+        gray: 'bg-gray-50 text-gray-700 border-gray-100'
+    }
+    return (
+        <div className={`p-6 rounded-3xl border-2 shadow-sm ${colors[color]}`}>
+            <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-70">{label}</p>
+            <p className="text-3xl font-black">{value}</p>
         </div>
     )
 }

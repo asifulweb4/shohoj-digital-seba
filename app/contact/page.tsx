@@ -1,86 +1,121 @@
 'use client'
-import { useState } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import { Phone, Mail, MapPin, Clock, Send, CheckCircle } from 'lucide-react'
+import { Mail, Phone, MapPin, Send, MessageSquare, Clock } from 'lucide-react'
 
 export default function ContactPage() {
-  const [sent, setSent] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({ name: '', phone: '', message: '' })
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    await new Promise(r => setTimeout(r, 1500))
-    setLoading(false)
-    setSent(true)
+    alert('ধন্যবাদ! আপনার বার্তাটি সফলভাবে পাঠানো হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।')
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-[#f6fdf9]">
       <Navbar />
-      <div className="hero-gradient py-16 text-center text-white">
-        <h1 className="text-4xl font-bold mb-3">যোগাযোগ করুন</h1>
-        <p className="text-violet-100">আমরা সবসময় আপনার সাহায্যে প্রস্তুত</p>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid lg:grid-cols-2 gap-12">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">আমাদের সাথে যোগাযোগ</h2>
-            <div className="space-y-4">
-              {[
-                { icon: Phone, label: 'ফোন', value: '০১৭০০-০০০০০০', href: 'tel:01700000000' },
-                { icon: Mail, label: 'ইমেইল', value: 'support@digitalshebabd.com', href: 'mailto:support@digitalshebabd.com' },
-                { icon: MapPin, label: 'ঠিকানা', value: 'ঢাকা, বাংলাদেশ', href: '#' },
-                { icon: Clock, label: 'সময়', value: 'সকাল ৮টা - রাত ১০টা (৭ দিন)', href: '#' },
-              ].map((item, i) => (
-                <a key={i} href={item.href} className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-[#7c3aed] transition-colors">
-                  <div className="w-12 h-12 bg-[#e8f5e9] rounded-xl flex items-center justify-center flex-shrink-0">
-                    <item.icon size={20} className="text-[#7c3aed]" />
+      
+      {/* Header */}
+      <section className="py-20 hero-gradient text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 stripe-accent opacity-20" />
+        <div className="max-w-4xl mx-auto px-4 relative z-10">
+          <h1 className="text-4xl md:text-5xl font-black mb-6 glow-green">যোগাযোগ করুন</h1>
+          <p className="text-emerald-100 text-lg font-medium">যেকোনো প্রশ্ন বা সহযোগিতার জন্য আমাদের মেসেজ দিন</p>
+        </div>
+      </section>
+
+      <section className="py-20 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          {/* Contact Info */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="glass p-8 rounded-3xl border border-emerald-100 shadow-sm">
+              <h2 className="text-2xl font-black text-[#022c22] mb-8">তথ্য কেন্দ্র</h2>
+              
+              <div className="space-y-8">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-[#ecfdf5] rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Phone className="text-[#059669]" size={20} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{item.label}</p>
-                    <p className="font-medium text-gray-800">{item.value}</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">ফোন করুন</p>
+                    <p className="text-[#022c22] font-black">+৮৮০ ১৭XXXX-XXXXXX</p>
                   </div>
-                </a>
-              ))}
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-[#fffbeb] rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Mail className="text-[#d97706]" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">ইমেইল</p>
+                    <p className="text-[#022c22] font-black">support@digitalshebabd.com</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-[#f0fdfa] rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <MapPin className="text-[#0d9488]" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">ঠিকানা</p>
+                    <p className="text-[#022c22] font-black">মিরপুর, ঢাকা, বাংলাদেশ</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-[#f0fdf4] rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Clock className="text-[#10b981]" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">অফিস সময়</p>
+                    <p className="text-[#022c22] font-black">শনিবার - বৃহস্পতিবার (১০ AM - ৮ PM)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Support Box */}
+            <div className="bg-[#022c22] p-8 rounded-3xl text-white relative overflow-hidden group">
+              <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+              <MessageSquare className="mb-4 text-emerald-400" size={32} />
+              <h3 className="text-xl font-bold mb-2">লাইভ সাপোর্ট</h3>
+              <p className="text-emerald-100/70 text-sm mb-6">আমাদের সাপোর্ট টিমের সাথে সরাসরি কথা বলতে হোয়াটসঅ্যাপ ব্যবহার করুন।</p>
+              <a href="https://wa.me/message/JJZIWPGL7JTXB1" target="_blank" rel="noopener noreferrer" className="btn-gold px-6 py-3 text-sm inline-block w-full text-center">হোয়াটসঅ্যাপ মেসেজ</a>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            {sent ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle size={32} className="text-[#7c3aed]" />
+
+          {/* Contact Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white p-8 md:p-12 rounded-3xl border border-emerald-100 shadow-xl">
+              <h2 className="text-2xl font-black text-[#022c22] mb-8">আমাদের বার্তা পাঠান</h2>
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">আপনার নাম</label>
+                  <input type="text" placeholder="পুরো নাম লিখুন" required className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none text-sm" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">বার্তা পাঠানো হয়েছে!</h3>
-                <p className="text-gray-500">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</p>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold text-gray-800 mb-5">বার্তা পাঠান</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">আপনার নাম</label>
-                    <input type="text" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="নাম লিখুন" className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm" required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">মোবাইল নম্বর</label>
-                    <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="01XXXXXXXXX" className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm" required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">বার্তা</label>
-                    <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} placeholder="আপনার বার্তা লিখুন..." rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm resize-none" required></textarea>
-                  </div>
-                  <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-3 btn-primary text-white font-bold rounded-xl">
-                    {loading ? <><div className="w-4 h-4 spinner"></div> পাঠানো হচ্ছে...</> : <><Send size={18} /> বার্তা পাঠান</>}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">ফোন নম্বর</label>
+                  <input type="tel" placeholder="০১৭XXXXXXXX" required className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none text-sm" />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">বিষয়</label>
+                  <input type="text" placeholder="বার্তার বিষয় লিখুন" required className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none text-sm" />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">আপনার বার্তা</label>
+                  <textarea rows={5} placeholder="আপনার বিস্তারিত সমস্যা বা প্রশ্ন লিখুন..." required className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none text-sm resize-none"></textarea>
+                </div>
+                <div className="md:col-span-2">
+                  <button type="submit" className="btn-primary w-full py-5 text-lg flex items-center justify-center gap-3">
+                    <Send size={20} /> বার্তা পাঠান
                   </button>
-                </form>
-              </>
-            )}
+                </div>
+              </form>
+            </div>
           </div>
+
         </div>
-      </div>
+      </section>
+
       <Footer />
     </div>
   )

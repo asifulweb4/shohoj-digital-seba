@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { User, Phone, CreditCard, Mail, ArrowLeft } from 'lucide-react' // ArrowLeft যোগ করা হয়েছে
+import { getProfile } from '@/lib/actions'
+import { User, Phone, CreditCard, Mail, ArrowLeft, ShieldCheck, MapPin, Calendar } from 'lucide-react'
 
 export default function ProfilePage() {
     const [profile, setProfile] = useState<any>(null)
@@ -10,71 +10,102 @@ export default function ProfilePage() {
     const router = useRouter()
 
     useEffect(() => {
-        const getProfile = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) { router.push('/auth/login'); return }
-
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-
+        const fetchProfile = async () => {
+            const profileData = await getProfile()
+            if (!profileData) {
+                router.push('/auth/login')
+                return
+            }
             setProfile(profileData)
             setLoading(false)
         }
-        getProfile()
+        fetchProfile()
     }, [router])
 
-    if (loading) return <div className="p-6 text-center">লোড হচ্ছে...</div>
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#f6fdf9]">
+                <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+            </div>
+        )
+    }
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            {/* --- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন --- */}
-            <button
-                onClick={() => router.push('/dashboard')}
-                className="flex items-center gap-2 text-gray-500 hover:text-violet-700 mb-6 text-sm font-bold"
-            >
-                <ArrowLeft size={16} /> ড্যাশবোর্ডে ফিরে যান
-            </button>
-            {/* --------------------------------- */}
+        <div className="min-h-screen bg-[#f6fdf9] p-4 sm:p-8">
+            <div className="max-w-3xl mx-auto">
+                <button
+                    onClick={() => router.push('/dashboard')}
+                    className="group flex items-center gap-2 text-emerald-800 hover:text-emerald-600 mb-8 font-black text-sm transition-all"
+                >
+                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> 
+                    ড্যাশবোর্ডে ফিরে যান
+                </button>
 
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">আমার প্রোফাইল</h1>
-
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 max-w-lg">
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-3xl font-bold">
-                        {profile?.full_name?.charAt(0)}
+                <div className="relative overflow-hidden bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-900/5 border border-emerald-50">
+                    <div className="h-32 bg-gradient-to-r from-[#022c22] via-[#064e3b] to-[#059669] relative">
+                        <div className="absolute inset-0 grid-dots opacity-20" />
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800">{profile?.full_name}</h2>
-                        <p className="text-gray-500 text-sm">মেম্বার আইডি: {profile?.id.substring(0, 8)}</p>
+
+                    <div className="px-8 pb-10">
+                        <div className="relative -mt-16 mb-8 flex flex-col sm:flex-row items-end gap-6">
+                            <div className="w-32 h-32 rounded-[2rem] bg-white p-2 shadow-xl">
+                                <div className="w-full h-full rounded-3xl bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center text-emerald-700 text-4xl font-black border-2 border-emerald-50">
+                                    {profile?.fullName?.charAt(0)}
+                                </div>
+                            </div>
+                            <div className="flex-1 mb-2">
+                                <h1 className="text-3xl font-black text-[#022c22]">{profile?.fullName}</h1>
+                                <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm mt-1">
+                                    <ShieldCheck size={16} /> 
+                                    Verified User 
+                                    <span className="mx-2 text-gray-300">|</span>
+                                    Phone: {profile?.phone}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <InfoItem icon={Mail} label="ইমেইল ঠিকানা" value={profile?.email} />
+                                <InfoItem icon={Phone} label="মোবাইল নম্বর" value={profile?.phone} />
+                                <InfoItem icon={CreditCard} label="এনআইডি নম্বর" value={profile?.nid || 'NID দেওয়া হয়নি'} />
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="bg-emerald-50/50 border border-emerald-100 p-6 rounded-3xl">
+                                    <p className="text-emerald-800 text-xs font-black uppercase tracking-widest mb-2">বর্তমান ব্যালেন্স</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-black text-emerald-900">{profile?.balance}</span>
+                                        <span className="text-emerald-600 font-bold text-lg">৳ (টাকা)</span>
+                                    </div>
+                                    <button onClick={() => router.push('/dashboard/balance')} className="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-lg shadow-emerald-200 transition-all">
+                                        ব্যালেন্স রিচার্জ করুন
+                                    </button>
+                                </div>
+
+                                <div className="bg-amber-50/50 border border-amber-100 p-6 rounded-3xl">
+                                    <p className="text-amber-800 text-xs font-black uppercase tracking-widest mb-1">একাউন্ট স্ট্যাটাস</p>
+                                    <p className="text-amber-600 font-black text-lg">সক্রিয় (Active)</p>
+                                    <p className="text-amber-700/60 text-xs font-bold mt-1">আপনি আমাদের সব সেবা উপভোগ করতে পারবেন</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    )
+}
 
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <Mail className="text-gray-400" size={20} />
-                        <div>
-                            <p className="text-xs text-gray-500">ইমেইল</p>
-                            <p className="font-medium text-gray-800">{profile?.email || 'ইমেইল নেই'}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <Phone className="text-gray-400" size={20} />
-                        <div>
-                            <p className="text-xs text-gray-500">ফোন নাম্বার</p>
-                            <p className="font-medium text-gray-800">{profile?.phone}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <CreditCard className="text-gray-400" size={20} />
-                        <div>
-                            <p className="text-xs text-gray-500">NID নাম্বার</p>
-                            <p className="font-medium text-gray-800">{profile?.nid || 'NID দেওয়া হয়নি'}</p>
-                        </div>
-                    </div>
-                </div>
+function InfoItem({ icon: Icon, label, value }: any) {
+    return (
+        <div className="flex items-center gap-4 p-4 bg-gray-50/50 hover:bg-white border border-gray-100 hover:border-emerald-100 rounded-3xl transition-all group">
+            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-emerald-600 shadow-sm border border-gray-100 group-hover:border-emerald-100 transition-all">
+                <Icon size={20} />
+            </div>
+            <div>
+                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest leading-none mb-1">{label}</p>
+                <p className="text-[#022c22] font-bold text-sm">{value || 'Not Provided'}</p>
             </div>
         </div>
     )
