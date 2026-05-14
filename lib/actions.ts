@@ -78,7 +78,7 @@ export async function placeOrderAction(service: { id: string, title: string, pri
     }
 
     try {
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             await tx.update(profiles)
                 .set({ balance: profile[0].balance - service.price })
                 .where(eq(profiles.id, (session as any).id))
@@ -143,7 +143,7 @@ export async function approveTransactionAction(id: number) {
     if (!session || (session as any).role !== 'admin') return { success: false }
 
     try {
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             const txn = await tx.select().from(transactions).where(eq(transactions.id, id)).limit(1)
             if (txn.length === 0 || txn[0].status !== 'pending') throw new Error('Invalid Transaction')
 
