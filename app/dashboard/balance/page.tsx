@@ -15,8 +15,8 @@ export default function BalancePage() {
     const router = useRouter()
 
     const paymentNumbers = {
-        bKash: '01333378924', // updated with site number
-        Nagad: ''
+        bKash: '01333858547',
+        Nagad: '01747156607'
     }
 
     const handleCopy = (num: string, type: string) => {
